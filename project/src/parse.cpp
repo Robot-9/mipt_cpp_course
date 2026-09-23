@@ -118,4 +118,4 @@ bool ParseEventLine(const std::string* line, Event* out) {
     return has_ts && has_type;
 }
 
-}
+}  // namespace nano_edr

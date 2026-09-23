@@ -11,32 +11,36 @@
 
 namespace {
 
-void PrintContext(const nano_edr::EventList* list) {
-    std::size_t count = list->size < 2 ? list->size : 2;
-    std::size_t skip = list->size - count;
-
-    const nano_edr::EventNode* node = list->head;
-
-    for (std::size_t i = 0; i < skip; ++i) {
-        node = node->next;
+void PrintContext(const nano_edr::EventList* list,
+                  const nano_edr::EventNode* previous_tail) {
+    if (previous_tail != nullptr) {
+        std::print(
+            "[CTX] -2: ts={} type={} pid={}\n",
+            previous_tail->event.ts,
+            previous_tail->event.type,
+            previous_tail->event.pid);
     }
 
-    int offset = -static_cast<int>(count);
-
-    while (node != nullptr) {
+    if (list->tail != nullptr) {
         std::print(
-            "[CTX] {}: ts={} type={} pid={}\n",
-            offset,
-            node->event.ts,
-            node->event.type,
-            node->event.pid
-        );
-
-        ++offset;
-        node = node->next;
+            "[CTX] -1: ts={} type={} pid={}\n",
+            list->tail->event.ts,
+            list->tail->event.type,
+            list->tail->event.pid);
     }
 }
 
+}  // namespace
+
+void PushEvent(
+    nano_edr::EventList* list,
+    nano_edr::EventNode** previous_tail,
+    const nano_edr::Event* event) {
+    nano_edr::EventNode* old_tail = list->tail;
+
+    nano_edr::ListPushBack(list, event);
+
+    *previous_tail = list->size >= 2 ? old_tail : nullptr;
 }
 
 int main(int argc, char** argv) {
@@ -63,8 +67,7 @@ int main(int argc, char** argv) {
             auto result = std::from_chars(
                 value.data(),
                 value.data() + value.size(),
-                window_size
-            );
+                window_size);
 
             if (result.ec != std::errc{} ||
                 result.ptr != value.data() + value.size()) {
@@ -91,8 +94,7 @@ int main(int argc, char** argv) {
     if (path.empty()) {
         std::print(
             stderr,
-            "использование: nano-edr <журнал.log> [--quiet] [--window-size N]\n"
-        );
+            "использование: nano-edr <журнал.log> [--quiet] [--window-size N]\n");
         return 2;
     }
 
@@ -105,13 +107,13 @@ int main(int argc, char** argv) {
 
     nano_edr::EventList window;
     window.capacity = window_size;
+    nano_edr::EventNode* previous_tail = nullptr;
 
     const std::string signs[] = {
         "wscript.exe",
         ".locked",
         "certutil.exe",
-        "\\Startup\\"
-    };
+        "\\Startup\\"};
 
     long long line_number = 0;
     long long event_count = 0;
@@ -162,26 +164,24 @@ int main(int argc, char** argv) {
                 "[DETECT] строка {}, признак {}: {}\n",
                 line_number,
                 sign,
-                line
-            );
+                line);
 
             detected = true;
             ++detection_count;
         }
 
         if (detected && !quiet) {
-            PrintContext(&window);
+            PrintContext(&window, previous_tail);
         }
 
-        nano_edr::ListPushBack(&window, &event);
+        PushEvent(&window, &previous_tail, &event);
     }
 
     if (!quiet) {
         std::print(
             "событий {}, детектов {}\n",
             event_count,
-            detection_count
-        );
+            detection_count);
 
         for (std::size_t i = 0; i < types.size(); ++i) {
             std::print("{}: {}\n", types[i], type_counts[i]);

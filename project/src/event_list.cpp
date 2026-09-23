@@ -53,4 +53,4 @@ EventList::~EventList() {
     ListClear(this);
 }
 
-}
+}  // namespace nano_edr
