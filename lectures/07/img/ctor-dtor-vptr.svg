@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 280" width="1060" height="280"
+     font-family="Golos Text, Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="pink" markerWidth="11" markerHeight="11" refX="10" refY="4.5"
+            orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L11,4.5 L0,9 z" fill="#ff8a8a"/>
+    </marker>
+  </defs>
+
+  <rect x="1" y="1" width="1058" height="278" rx="16" fill="#0b0b0d" stroke="#26262b"/>
+
+  <g stroke="#26262b" stroke-width="1.5">
+    <line x1="280" y1="36" x2="280" y2="212"/>
+    <line x1="530" y1="36" x2="530" y2="212"/>
+    <line x1="780" y1="36" x2="780" y2="212"/>
+  </g>
+
+  <!-- моменты жизни объекта, слева направо -->
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="18" fill="#ffffff" text-anchor="middle">
+    <text x="155" y="58">Base()</text>
+    <text x="405" y="58">Derived()</text>
+    <text x="655" y="58">~Derived()</text>
+    <text x="905" y="58">~Base()</text>
+  </g>
+
+  <!-- подписи над объектом и таблицей -->
+  <g font-size="13" fill="#5c5e66">
+    <text x="40" y="88">объект d</text>
+    <text x="174" y="88">vtable</text>
+    <text x="290" y="88">объект d</text>
+    <text x="424" y="88">vtable</text>
+    <text x="540" y="88">объект d</text>
+    <text x="674" y="88">vtable</text>
+    <text x="790" y="88">объект d</text>
+    <text x="924" y="88">vtable</text>
+  </g>
+
+  <!-- vptr: ячейки, стрелки, таблицы -->
+  <g fill="rgba(255,138,138,0.08)" stroke="#ff8a8a" stroke-width="2">
+    <rect x="40" y="96" width="100" height="34"/>
+    <rect x="290" y="96" width="100" height="34"/>
+    <rect x="540" y="96" width="100" height="34"/>
+    <rect x="790" y="96" width="100" height="34"/>
+  </g>
+  <g stroke="#ff8a8a" stroke-width="2.5">
+    <line x1="140" y1="113" x2="172" y2="113" marker-end="url(#pink)"/>
+    <line x1="390" y1="113" x2="422" y2="113" marker-end="url(#pink)"/>
+    <line x1="640" y1="113" x2="672" y2="113" marker-end="url(#pink)"/>
+    <line x1="890" y1="113" x2="922" y2="113" marker-end="url(#pink)"/>
+  </g>
+  <g fill="rgba(255,255,255,0.04)" stroke="#dbdfe6" stroke-width="1.5">
+    <rect x="174" y="96" width="96" height="34"/>
+    <rect x="424" y="96" width="96" height="34"/>
+    <rect x="674" y="96" width="96" height="34"/>
+    <rect x="924" y="96" width="96" height="34"/>
+  </g>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="15">
+    <text x="54" y="118" fill="#ff8a8a">vptr</text>
+    <text x="304" y="118" fill="#ff8a8a">vptr</text>
+    <text x="554" y="118" fill="#ff8a8a">vptr</text>
+    <text x="804" y="118" fill="#ff8a8a">vptr</text>
+    <g text-anchor="middle" fill="#dbdfe6">
+      <text x="222" y="118">Base</text>
+      <text x="472" y="118">Derived</text>
+      <text x="722" y="118">Derived</text>
+      <text x="972" y="118">Base</text>
+    </g>
+  </g>
+
+  <!-- name_: ещё нет, есть, есть, уже нет -->
+  <rect x="40" y="130" width="100" height="34" fill="none" stroke="#5c5e66" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <rect x="290" y="130" width="100" height="34" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="1.5"/>
+  <rect x="540" y="130" width="100" height="34" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="1.5"/>
+  <rect x="790" y="130" width="100" height="34" fill="none" stroke="#5c5e66" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <line x1="796" y1="159" x2="884" y2="135" stroke="#ff2020" stroke-width="2"/>
+  <line x1="796" y1="135" x2="884" y2="159" stroke="#ff2020" stroke-width="2"/>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="15">
+    <text x="54" y="152" fill="#5c5e66">name_</text>
+    <text x="304" y="152" fill="#dbdfe6">name_</text>
+    <text x="554" y="152" fill="#dbdfe6">name_</text>
+    <text x="804" y="152" fill="#5c5e66">name_</text>
+    <text x="400" y="152" font-size="14" fill="#ffffff">"ready"</text>
+    <text x="650" y="152" font-size="14" fill="#ffffff">"ready"</text>
+  </g>
+  <g font-size="13" fill="#80828c">
+    <text x="150" y="152">ещё не создан</text>
+    <text x="900" y="152">уже уничтожен</text>
+  </g>
+
+  <!-- куда попадает виртуальный вызов -->
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="15" text-anchor="middle" fill="#dbdfe6">
+    <text x="155" y="198">hello() → <tspan fill="#ffffff">Base::hello</tspan></text>
+    <text x="405" y="198">hello() → <tspan fill="#ffffff">Derived::hello</tspan></text>
+    <text x="655" y="198">hello() → <tspan fill="#ffffff">Derived::hello</tspan></text>
+    <text x="905" y="198">hello() → <tspan fill="#ffffff">Base::hello</tspan></text>
+  </g>
+
+  <!-- итог по периодам -->
+  <g fill="none" stroke-width="1.5">
+    <path d="M 40 224 V 232 H 270 V 224" stroke="#5c5e66"/>
+    <path d="M 290 224 V 232 H 770 V 224" stroke="#dbdfe6"/>
+    <path d="M 790 224 V 232 H 1020 V 224" stroke="#5c5e66"/>
+  </g>
+  <g font-size="15" text-anchor="middle">
+    <text x="155" y="258" fill="#80828c">ведёт себя как <tspan font-family="Consolas, Roboto Mono, monospace">Base</tspan></text>
+    <text x="530" y="258" fill="#dbdfe6">ведёт себя как <tspan font-family="Consolas, Roboto Mono, monospace">Derived</tspan></text>
+    <text x="905" y="258" fill="#80828c">ведёт себя как <tspan font-family="Consolas, Roboto Mono, monospace">Base</tspan></text>
+  </g>
+</svg>

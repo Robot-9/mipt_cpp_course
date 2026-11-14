@@ -15,42 +15,40 @@
 
   <text x="185" y="88" font-size="13" text-anchor="middle" fill="#5c5e66">память объекта освобождена</text>
   <rect x="70" y="96" width="230" height="76" fill="none" stroke="#5c5e66" stroke-width="1.5" stroke-dasharray="7 6"/>
-  <text x="185" y="122" font-size="15" text-anchor="middle" fill="#5c5e66">объект Dog</text>
+  <text x="185" y="122" font-size="15" text-anchor="middle" fill="#5c5e66">объект <tspan font-family="Consolas, Roboto Mono, monospace">ByNameRule</tspan></text>
   <rect x="86" y="132" width="198" height="30" fill="none" stroke="#3a3a40" stroke-width="1.5" stroke-dasharray="6 5"/>
   <text x="185" y="152" font-size="14" text-anchor="middle" fill="#5c5e66"
-        font-family="Consolas, Roboto Mono, monospace">buf_</text>
+        font-family="Consolas, Roboto Mono, monospace">names_</text>
 
   <line x1="300" y1="134" x2="354" y2="134" stroke="#3a3a40" stroke-width="2"
         stroke-dasharray="5 4" marker-end="url(#dim)"/>
 
   <text x="425" y="88" font-size="13" text-anchor="middle" fill="#80828c">в куче</text>
   <rect x="360" y="96" width="130" height="76" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
-  <text x="425" y="141" font-size="18" text-anchor="middle" fill="#ffffff"
-        font-family="Consolas, Roboto Mono, monospace">Buffer</text>
-  <text x="425" y="192" font-size="14" text-anchor="middle" fill="#ff2020">цел — и никто его не удалит</text>
+  <text x="425" y="140" font-size="17" text-anchor="middle" fill="#ffffff">строки</text>
+  <text x="425" y="192" font-size="14" text-anchor="middle" fill="#ff2020">целы — и никто их не удалит</text>
 
-  <text x="280" y="232" font-size="17" text-anchor="middle" fill="#dbdfe6">вызвался только <tspan font-family="Consolas, Roboto Mono, monospace">~Animal()</tspan></text>
-  <text x="280" y="260" font-size="16" text-anchor="middle" fill="#ff2020"><tspan font-family="Consolas, Roboto Mono, monospace">~Dog()</tspan> пропущен, <tspan font-family="Consolas, Roboto Mono, monospace">buf_</tspan> не освобождён</text>
+  <text x="280" y="232" font-size="17" text-anchor="middle" fill="#dbdfe6">вызвался только <tspan font-family="Consolas, Roboto Mono, monospace">~Rule()</tspan></text>
+  <text x="280" y="260" font-size="16" text-anchor="middle" fill="#ff2020"><tspan font-family="Consolas, Roboto Mono, monospace">~ByNameRule()</tspan> пропущен, <tspan font-family="Consolas, Roboto Mono, monospace">names_</tspan> не освобождён</text>
 
   <!-- виртуальный -->
   <text x="780" y="60" font-size="19" text-anchor="middle" fill="#dbdfe6">деструктор виртуальный</text>
 
   <text x="685" y="88" font-size="13" text-anchor="middle" fill="#5c5e66">память объекта освобождена</text>
   <rect x="570" y="96" width="230" height="76" fill="none" stroke="#5c5e66" stroke-width="1.5" stroke-dasharray="7 6"/>
-  <text x="685" y="122" font-size="15" text-anchor="middle" fill="#5c5e66">объект Dog</text>
+  <text x="685" y="122" font-size="15" text-anchor="middle" fill="#5c5e66">объект <tspan font-family="Consolas, Roboto Mono, monospace">ByNameRule</tspan></text>
   <rect x="586" y="132" width="198" height="30" fill="none" stroke="#3a3a40" stroke-width="1.5" stroke-dasharray="6 5"/>
   <text x="685" y="152" font-size="14" text-anchor="middle" fill="#5c5e66"
-        font-family="Consolas, Roboto Mono, monospace">buf_</text>
+        font-family="Consolas, Roboto Mono, monospace">names_</text>
 
   <line x1="800" y1="134" x2="854" y2="134" stroke="#3a3a40" stroke-width="2"
         stroke-dasharray="5 4" marker-end="url(#dim)"/>
 
   <text x="925" y="88" font-size="13" text-anchor="middle" fill="#80828c">в куче</text>
   <rect x="860" y="96" width="130" height="76" fill="none" stroke="#5c5e66" stroke-width="1.5" stroke-dasharray="7 6"/>
-  <text x="925" y="141" font-size="18" text-anchor="middle" fill="#5c5e66"
-        font-family="Consolas, Roboto Mono, monospace">Buffer</text>
-  <text x="925" y="192" font-size="14" text-anchor="middle" fill="#80828c">освобождён в <tspan font-family="Consolas, Roboto Mono, monospace">~Dog()</tspan></text>
+  <text x="925" y="140" font-size="17" text-anchor="middle" fill="#5c5e66">строки</text>
+  <text x="925" y="192" font-size="14" text-anchor="middle" fill="#80828c">освобождены в <tspan font-family="Consolas, Roboto Mono, monospace">~ByNameRule()</tspan></text>
 
-  <text x="780" y="232" font-size="17" text-anchor="middle" fill="#dbdfe6">вызвались <tspan font-family="Consolas, Roboto Mono, monospace">~Dog()</tspan>, затем <tspan font-family="Consolas, Roboto Mono, monospace">~Animal()</tspan></text>
+  <text x="780" y="232" font-size="17" text-anchor="middle" fill="#dbdfe6">вызвались <tspan font-family="Consolas, Roboto Mono, monospace">~ByNameRule()</tspan>, затем <tspan font-family="Consolas, Roboto Mono, monospace">~Rule()</tspan></text>
   <text x="780" y="260" font-size="16" text-anchor="middle" fill="#dbdfe6">в куче не осталось ничего</text>
 </svg>

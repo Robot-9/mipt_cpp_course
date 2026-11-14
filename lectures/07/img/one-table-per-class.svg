@@ -37,10 +37,11 @@
     <line x1="252" y1="193" x2="344" y2="158" marker-end="url(#pink)"/>
   </g>
 
-  <rect x="350" y="112" width="190" height="80" fill="rgba(255,255,255,0.04)" stroke="#dbdfe6" stroke-width="2"/>
-  <text x="445" y="140" font-size="16" text-anchor="middle" fill="#dbdfe6"
+  <rect x="350" y="104" width="190" height="98" fill="rgba(255,255,255,0.04)" stroke="#dbdfe6" stroke-width="2"/>
+  <text x="445" y="132" font-size="16" text-anchor="middle" fill="#dbdfe6"
         font-family="Consolas, Roboto Mono, monospace">vtable</text>
-  <text x="445" y="164" font-size="14" text-anchor="middle" fill="#80828c">одна на класс</text>
+  <text x="445" y="156" font-size="14" text-anchor="middle" fill="#80828c">одна на класс</text>
+  <text x="445" y="182" font-size="14" text-anchor="middle" fill="#80828c">и в ней же RTTI</text>
 
   <text x="300" y="292" font-size="16" text-anchor="middle" fill="#dbdfe6">миллион объектов — миллион указателей и одна таблица</text>
 

@@ -14,7 +14,7 @@
   <rect x="1" y="1" width="1058" height="348" rx="16" fill="#0b0b0d" stroke="#26262b"/>
 
   <text x="180" y="56" font-size="18" text-anchor="middle" fill="#dbdfe6">вызов</text>
-  <text x="700" y="56" font-size="18" text-anchor="middle" fill="#dbdfe6">кандидаты: выше — приоритетнее</text>
+  <text x="700" y="56" font-size="18" text-anchor="middle" fill="#dbdfe6">при равной точности совпадения: выше — приоритетнее</text>
 
   <!-- вызовы -->
   <rect x="50" y="76" width="260" height="56" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
@@ -54,7 +54,7 @@
   <text x="432" y="268" font-size="17" fill="#ffffff"
         font-family="Consolas, Roboto Mono, monospace">template &lt;typename T&gt; void f(T)</text>
   <text x="962" y="268" font-size="14" text-anchor="end" fill="#80828c">менее специализированный</text>
-  <text x="432" y="289" font-size="14" fill="#80828c">подходит любому T — берётся, когда не подошло ничего выше</text>
+  <text x="432" y="289" font-size="14" fill="#80828c">подходит любому T — любой аргумент принимает без преобразований</text>
 
   <!-- ось приоритета -->
   <line x1="1012" y1="82" x2="1012" y2="294" stroke="#80828c" stroke-width="2" marker-end="url(#grey)"/>

@@ -27,7 +27,7 @@
 
   <text x="320" y="204" font-size="15" text-anchor="middle" fill="#80828c">объект Dog в памяти</text>
 
-  <text x="290" y="246" font-size="17" text-anchor="middle" fill="#dbdfe6">адрес тот же, взгляд уже</text>
+  <text x="290" y="246" font-size="17" text-anchor="middle" fill="#dbdfe6">смещение известно (здесь 0), взгляд уже</text>
   <text x="290" y="274" font-size="15" text-anchor="middle" fill="#80828c">преобразование неявное и безопасное</text>
 
   <!-- downcast -->

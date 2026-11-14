@@ -1,8 +1,12 @@
-// Примитив занятия 3.3: сколько стоит копия. См. README.md рядом.
+// Упражнение занятия 3.3: сколько стоит копия. Что предсказать до запуска
+// и что сдать — в постановке занятия, раздел «Упражнение».
 //
-// Собирать только с оптимизацией:
-//   g++ -std=c++23 -O2 -Wall -Wextra -o copies copies.cpp
-//   ./copies
+// Сборка — своей целью, из корня проекта:
+//   cmake --build --preset windows --target copies
+//   ./build/windows/Release/copies
+// На Linux — --preset linux и ./build/linux/copies. Только Release: пресеты
+// windows и linux так и собирают, а в отладочной сборке измерялась бы работа
+// отладочных проверок, а не разница между копией и перемещением.
 //
 // Здесь нет ни симулятора, ни агента — один файл, который можно унести
 // и запустить где угодно. Разбирается одна вещь: во что обходится строка
@@ -133,9 +137,11 @@ struct Result {
 
 constexpr std::size_t kEvents = 200000;
 
-// Контрольная сумма нужна, чтобы компилятор не выбросил всю работу целиком.
-// Без неё цикл, результат которого никому не нужен, законно исчезает,
-// и замер показывает ноль наносекунд на любую из двух версий.
+// Контрольная сумма нужна, чтобы компилятор не выбросил всю работу целиком:
+// цикл, результат которого никому не нужен, оптимизатор вправе убрать,
+// и тогда замер показал бы ноль наносекунд на любую из версий. Убирает ли
+// он его на самом деле, зависит от того, что ещё делает каждая итерация, —
+// это один из опытов упражнения.
 template <typename Build>
 Result Measure(Build build) {
     g_allocations = 0;
@@ -161,19 +167,58 @@ Result Measure(Build build) {
     return result;
 }
 
+// --- печать таблицы --------------------------------------------------------
+//
+// Ширина в printf — `%-28s` — считается в байтах, а буква кириллицы в UTF-8
+// занимает два байта. Русская надпись шириной 28 байт выходит строкой
+// в 14 букв, и столбцы съезжают. Поэтому надписи выравниваются вручную,
+// по числу символов: символ начинается с любого байта, кроме продолжения
+// вида 10xxxxxx.
+std::size_t Columns(const char* text) {
+    std::size_t columns = 0;
+    for (const char* p = text; *p != '\0'; ++p) {
+        if ((static_cast<unsigned char>(*p) & 0xC0) != 0x80) {
+            ++columns;
+        }
+    }
+    return columns;
+}
+
+// Текст, дополненный пробелами до width символов: слева или справа.
+void PrintPadded(const char* text, std::size_t width, bool align_left) {
+    const std::size_t columns = Columns(text);
+    const int pad = columns < width ? static_cast<int>(width - columns) : 0;
+    if (align_left) {
+        std::printf("%s%*s", text, pad, "");
+    } else {
+        std::printf("%*s%s", pad, "", text);
+    }
+}
+
+void PrintHeader(const char* name, const char* allocations, const char* bytes,
+                 const char* nanos) {
+    PrintPadded(name, 28, true);
+    std::printf(" ");
+    PrintPadded(allocations, 10, false);
+    std::printf(" ");
+    PrintPadded(bytes, 12, false);
+    std::printf(" ");
+    PrintPadded(nanos, 9, false);
+    std::printf("\n");
+}
+
 void Print(const char* name, const Result& result) {
-    std::printf("%-28s %10zu %12zu %9.1f\n", name,
-                result.allocations / kEvents, result.bytes / kEvents,
-                result.nanos);
+    PrintPadded(name, 28, true);
+    std::printf(" %10zu %12zu %9.1f\n", result.allocations / kEvents,
+                result.bytes / kEvents, result.nanos);
 }
 
 }  // namespace
 
 int main() {
     std::printf("событий: %zu\n\n", kEvents);
-    std::printf("%-28s %10s %12s %9s\n", "как строим", "аллокаций", "байт",
-                "нс");
-    std::printf("%-28s %10s %12s %9s\n", "", "на событие", "на событие", "");
+    PrintHeader("как строим", "аллокаций", "байт", "нс");
+    PrintHeader("", "на событие", "на событие", "");
 
     // Первая версия: части живут в именованной переменной, событие строится
     // из константной ссылки. Ровно так выглядел агент до занятия 3.3.

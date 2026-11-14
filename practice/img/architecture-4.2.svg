@@ -1,0 +1,257 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 900" width="1080" height="900"
+     font-family="Golos Text, Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="flow" markerWidth="11" markerHeight="11" refX="10" refY="4.5"
+            orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L11,4.5 L0,9 z" fill="#dbdfe6"/>
+    </marker>
+    <marker id="pink" markerWidth="11" markerHeight="11" refX="10" refY="4.5"
+            orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L11,4.5 L0,9 z" fill="#ff8a8a"/>
+    </marker>
+  </defs>
+
+  <rect x="1" y="1" width="1078" height="898" rx="16" fill="#0b0b0d" stroke="#26262b"/>
+
+  <!-- ================= легенда ================= -->
+  <g id="ownership" font-size="13">
+    <text x="40" y="45" font-size="13" fill="#5c5e66"
+          font-family="Golos Text, Segoe UI, Helvetica, Arial, sans-serif">файлы:</text>
+
+    <rect x="100" y="28" width="104" height="24" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="152" y="45" text-anchor="middle" fill="#80828c">комплект</text>
+
+    <rect x="216" y="28" width="112" height="24" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="272" y="45" text-anchor="middle" fill="#ffffff">копируете</text>
+
+    <rect x="340" y="28" width="112" height="24" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="396" y="45" text-anchor="middle" fill="#dbdfe6">меняете</text>
+
+    <rect x="464" y="28" width="132" height="24" fill="#dbdfe6"/>
+    <text x="530" y="45" text-anchor="middle" fill="#0b0b0d" font-weight="bold">пишете с нуля</text>
+  </g>
+  <text x="616" y="45" font-size="13" fill="#5c5e66">комплект менять нельзя; остальное — ваш src/</text>
+
+  <text x="40" y="78" font-size="13" fill="#5c5e66">связи:</text>
+  <line x1="100" y1="73" x2="150" y2="73" stroke="#ff8a8a" stroke-width="2.5" marker-end="url(#pink)"/>
+  <text x="160" y="78" font-size="13" fill="#80828c">хранит в поле</text>
+  <line x1="290" y1="73" x2="340" y2="73" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="350" y="78" font-size="13" fill="#80828c">вызывает</text>
+
+  <line x1="40" y1="96" x2="1040" y2="96" stroke="#26262b" stroke-width="1"/>
+
+  <!-- ================= main ================= -->
+  <rect x="40" y="112" width="250" height="150" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="165" y="142" font-size="20" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">main</text>
+  <line x1="56" y1="156" x2="274" y2="156" stroke="#26262b" stroke-width="1"/>
+  <text x="58" y="182" font-size="13" fill="#80828c">флаг --rules &lt;путь&gt;;</text>
+  <text x="58" y="201" font-size="13" fill="#80828c">отказ старта — код 1</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="58" y="218" width="84" height="28" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="100" y="237" text-anchor="middle" fill="#dbdfe6">main.cpp</text>
+  </g>
+
+  <!-- main → агент -->
+  <line x1="290" y1="170" x2="354" y2="170" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="322" y="162" font-size="12" text-anchor="middle" fill="#80828c">создаёт</text>
+
+  <!-- ================= Agent ================= -->
+  <rect x="360" y="112" width="300" height="150" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="510" y="140" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">Agent</text>
+  <text x="378" y="168" font-size="13" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">engine_ : RuleEngine</text>
+  <text x="378" y="190" font-size="12" fill="#80828c">без --rules — десять правил из кода;</text>
+  <text x="378" y="208" font-size="12" fill="#80828c">с --rules — девять из файла и дроппер</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="378" y="224" width="70" height="28" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="413" y="243" text-anchor="middle" fill="#dbdfe6">agent.h</text>
+    <rect x="456" y="224" width="84" height="28" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="498" y="243" text-anchor="middle" fill="#dbdfe6">agent.cpp</text>
+  </g>
+
+  <!-- агент → набор правил -->
+  <line x1="660" y1="170" x2="734" y2="170" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="697" y="162" font-size="12" text-anchor="middle" fill="#80828c">заполняет</text>
+
+  <!-- ================= набор правил ================= -->
+  <rect x="740" y="112" width="300" height="150" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="890" y="140" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">набор правил из кода</text>
+  <text x="890" y="168" font-size="13" text-anchor="middle" fill="#80828c">встроенный — десять правил;</text>
+  <text x="890" y="187" font-size="13" text-anchor="middle" fill="#80828c">для --rules — только дроппер</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="758" y="218" width="116" height="28" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="816" y="237" text-anchor="middle" fill="#dbdfe6">agent_rules.h</text>
+    <rect x="882" y="218" width="130" height="28" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="947" y="237" text-anchor="middle" fill="#dbdfe6">agent_rules.cpp</text>
+  </g>
+
+  <!-- main → источник -->
+  <line x1="165" y1="262" x2="165" y2="324" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="177" y="298" font-size="12" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">OsSource::Open</text>
+
+  <!-- агент → реагирование -->
+  <line x1="510" y1="262" x2="510" y2="324" stroke="#ff8a8a" stroke-width="2.5" marker-end="url(#pink)"/>
+  <text x="500" y="298" font-size="12" text-anchor="end" fill="#ff8a8a"
+        font-family="Consolas, Roboto Mono, monospace">responder_</text>
+
+  <!-- агент → загрузчик -->
+  <line x1="660" y1="236" x2="756" y2="326" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="714" y="300" font-size="12" text-anchor="end" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">Load</text>
+
+  <!-- ================= OsSource ================= -->
+  <rect x="40" y="330" width="250" height="150" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="165" y="358" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">OsSource</text>
+  <text x="58" y="384" font-size="12" fill="#80828c">Open — отказ значением;</text>
+  <text x="58" y="402" font-size="12" fill="#80828c">Run — отказ исключением</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="58" y="436" width="84" height="28" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="100" y="455" text-anchor="middle" fill="#dbdfe6">sources.h</text>
+    <rect x="150" y="436" width="100" height="28" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="200" y="455" text-anchor="middle" fill="#dbdfe6">sources.cpp</text>
+  </g>
+
+  <!-- ================= Responder ================= -->
+  <rect x="360" y="330" width="300" height="150" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="510" y="358" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">Responder</text>
+  <text x="378" y="384" font-size="12" fill="#80828c">ветвится по виду отказа:</text>
+  <text x="378" y="402" font-size="12" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">kNoSuchProcess, kPidReused, …</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="378" y="436" width="92" height="28" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="424" y="455" text-anchor="middle" fill="#80828c">response.h</text>
+    <rect x="478" y="436" width="108" height="28" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="532" y="455" text-anchor="middle" fill="#dbdfe6">response.cpp</text>
+  </g>
+
+  <!-- ================= RuleLoader ================= -->
+  <rect x="740" y="330" width="300" height="150" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="890" y="358" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">RuleLoader</text>
+  <text x="758" y="384" font-size="12" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">Load, Parse → expected</text>
+  <text x="758" y="404" font-size="12" fill="#80828c">отказ — путь:строка: что не так;</text>
+  <text x="758" y="421" font-size="12" fill="#80828c">правила — RuleSet, затем в движок</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="758" y="436" width="112" height="28" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="814" y="455" text-anchor="middle" fill="#80828c">rule_loader.h</text>
+    <rect x="878" y="436" width="130" height="28" fill="#dbdfe6"/>
+    <text x="943" y="455" text-anchor="middle" fill="#0b0b0d" font-weight="bold">rule_loader.cpp</text>
+  </g>
+
+  <!-- источник → обёртка -->
+  <line x1="165" y1="480" x2="165" y2="544" stroke="#ff8a8a" stroke-width="2.5" marker-end="url(#pink)"/>
+  <text x="155" y="516" font-size="12" text-anchor="end" fill="#ff8a8a"
+        font-family="Consolas, Roboto Mono, monospace">handle_</text>
+
+  <!-- реагирование → обёртка -->
+  <line x1="380" y1="480" x2="298" y2="546" stroke="#ff8a8a" stroke-width="2.5" marker-end="url(#pink)"/>
+  <text x="352" y="526" font-size="12" fill="#ff8a8a"
+        font-family="Consolas, Roboto Mono, monospace">os_</text>
+
+  <!-- реагирование → отказ -->
+  <line x1="510" y1="480" x2="510" y2="544" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="522" y="516" font-size="12" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">OutcomeText</text>
+
+  <!-- загрузчик → разбор условия -->
+  <line x1="890" y1="480" x2="890" y2="544" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="902" y="516" font-size="12" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">BuildCondition</text>
+
+  <!-- ================= OsHandle ================= -->
+  <rect x="40" y="550" width="250" height="160" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="165" y="578" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">OsHandle</text>
+  <text x="58" y="604" font-size="12" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">Open → expected</text>
+  <text x="58" y="624" font-size="12" fill="#80828c">конструктор приватный;</text>
+  <text x="58" y="642" font-size="12" fill="#80828c">перемещение — std::exchange</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="58" y="664" width="100" height="28" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="108" y="683" text-anchor="middle" fill="#80828c">os_handle.h</text>
+    <rect x="166" y="664" width="116" height="28" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="224" y="683" text-anchor="middle" fill="#dbdfe6">os_handle.cpp</text>
+  </g>
+
+  <!-- обёртка → отказ -->
+  <line x1="290" y1="610" x2="354" y2="610" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+
+  <!-- ================= OsError ================= -->
+  <rect x="360" y="550" width="300" height="160" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="510" y="578" font-size="16" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">OsError, OsErrorKind</text>
+  <text x="378" y="604" font-size="12" fill="#80828c">вид отказа; успеха и таймаута в нём нет</text>
+  <text x="378" y="624" font-size="12" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">OsErrorKindOf  MakeOsError</text>
+  <text x="378" y="642" font-size="12" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">Message  OutcomeText</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="378" y="664" width="92" height="28" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="424" y="683" text-anchor="middle" fill="#80828c">os_error.h</text>
+    <rect x="478" y="664" width="108" height="28" fill="#dbdfe6"/>
+    <text x="532" y="683" text-anchor="middle" fill="#0b0b0d" font-weight="bold">os_error.cpp</text>
+  </g>
+
+  <!-- ================= разбор условия ================= -->
+  <rect x="740" y="550" width="300" height="160" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="890" y="576" font-size="16" text-anchor="middle" fill="#ffffff">разбор строки условия</text>
+  <text x="758" y="598" font-size="12" fill="#80828c">кавычки, or, type is a or b;</text>
+  <text x="758" y="616" font-size="12" fill="#80828c">тип события — EventTypeFromString</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="758" y="630" width="100" height="28" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="808" y="649" text-anchor="middle" fill="#80828c">rule_text.h</text>
+    <rect x="866" y="630" width="116" height="28" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="924" y="649" text-anchor="middle" fill="#ffffff">rule_text.cpp</text>
+    <rect x="758" y="668" width="76" height="28" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="796" y="687" text-anchor="middle" fill="#80828c">event.h</text>
+    <rect x="842" y="668" width="84" height="28" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="884" y="687" text-anchor="middle" fill="#dbdfe6">event.cpp</text>
+  </g>
+
+  <!-- загрузчик → файл правил -->
+  <path d="M 740 420 H 700 V 820 H 666" fill="none" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="694" y="758" font-size="12" text-anchor="end" fill="#80828c">читает</text>
+
+  <!-- ================= тесты обёртки ================= -->
+  <rect x="40" y="770" width="250" height="100" fill="none" stroke="#80828c" stroke-width="1.5"/>
+  <text x="165" y="794" font-size="14" text-anchor="middle" fill="#80828c">выданные тесты</text>
+  <text x="56" y="820" font-size="13" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">os_handle_tests.cpp</text>
+  <text x="56" y="840" font-size="12" fill="#5c5e66">9 случаев: фабрика, перемещение,</text>
+  <text x="56" y="857" font-size="12" fill="#5c5e66">виды отказа</text>
+
+  <!-- тесты → обёртка -->
+  <line x1="165" y1="770" x2="165" y2="716" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="177" y="748" font-size="12" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">Open</text>
+
+  <!-- ================= файл правил ================= -->
+  <rect x="360" y="770" width="300" height="100" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="510" y="796" font-size="16" text-anchor="middle" fill="#ffffff">файл правил в корне проекта</text>
+  <text x="510" y="818" font-size="12" text-anchor="middle" fill="#80828c">девять правил трёх видов</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="462" y="830" width="96" height="28" fill="#dbdfe6"/>
+    <text x="510" y="849" text-anchor="middle" fill="#0b0b0d" font-weight="bold">rules.conf</text>
+  </g>
+
+  <!-- ================= тесты загрузчика ================= -->
+  <rect x="740" y="770" width="300" height="100" fill="none" stroke="#80828c" stroke-width="1.5"/>
+  <text x="890" y="794" font-size="14" text-anchor="middle" fill="#80828c">выданные тесты</text>
+  <text x="756" y="820" font-size="13" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">rule_loader_tests.cpp</text>
+  <text x="756" y="840" font-size="12" fill="#5c5e66">15 случаев: битые строки</text>
+  <text x="756" y="857" font-size="12" fill="#5c5e66">и номер строки в отказе</text>
+
+  <!-- тесты → загрузчик -->
+  <path d="M 1040 820 H 1056 V 400 H 1046" fill="none" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="1072" y="640" font-size="12" text-anchor="middle" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace" transform="rotate(-90 1072 640)">Parse</text>
+
+</svg>

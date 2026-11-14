@@ -30,6 +30,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <string>
 #include <utility>
@@ -39,9 +40,6 @@
 #include "entity_model.h"
 #include "event.h"
 #include "fields.h"
-// Свой `Function` студент пишет сам на занятии 3.2 и кладёт в src/ —
-// этот каталог стоит на include-пути раньше комплекта.
-#include "function.h"
 // Кольцевой буфер студент пишет сам на занятии 3.1 и кладёт в src/ —
 // этот каталог стоит на include-пути раньше комплекта.
 #include "ring_buffer.h"
@@ -90,7 +88,7 @@ class RuleBase : public IRule {
 
  private:
     std::string id_;
-    Severity severity_;
+    Severity severity_ = Severity::kLow;
     std::vector<std::string> actions_;
     std::size_t hits_ = 0;
 };
@@ -100,7 +98,7 @@ class MatchRule : public RuleBase {
  public:
     MatchRule(const std::string& id, Severity severity);
 
-    // Владение условием переходит правилу. Отсюда unique_ptr в подписи:
+    // Владение условием переходит правилу. Отсюда unique_ptr в сигнатуре:
     // он говорит об этом сам, и забыть освободить условие нечем.
     void AddCondition(std::unique_ptr<ICondition> condition);
 
@@ -118,10 +116,8 @@ class MatchRule : public RuleBase {
 // проверкой одного события. «Скриптовый хост, запущенный офисным приложением»
 // — это два события, между ними время, и связь между ними по pid.
 //
-// Состояние здесь маленькое намеренно: список незавершённых совпадений
-// с временем и pid. Полноценное окно событий, три шага и связки вроде
-// child_of_prev — занятие 3.1; здесь двух шагов и same_pid достаточно, чтобы
-// увидеть, чем правило с состоянием отличается от правила без него.
+// Состояние здесь маленькое намеренно: записи первого шага с временем
+// и pid. Связь шагов — тот же pid или, с занятия 3.2, связка child_of_prev.
 class SequenceRule : public RuleBase {
  public:
     // window_ms — сколько модельного времени второй шаг ждёт первого.
@@ -135,7 +131,7 @@ class SequenceRule : public RuleBase {
     void set_same_pid(bool value) { same_pid_ = value; }
 
     // Связка `child_of_prev`: второй шаг произошёл в процессе, чей родитель —
-    // процесс первого шага. Занятие 3.2, домашняя часть.
+    // процесс первого шага. Занятие 3.2.
     //
     // Окно событий этого не умеет и уметь не может: в событии `process_start`
     // родитель есть, а в остальных нет, и «кто родитель pid» — вопрос
@@ -154,8 +150,8 @@ class SequenceRule : public RuleBase {
 
     bool Check(const Event& event) override;
 
-    // Сколько незавершённых совпадений держится сейчас. Нужно тестам
-    // и полезно на паре: у правила с состоянием память растёт, и увидеть,
+    // Сколько незавершённых совпадений держится сейчас. Нужно тестам,
+    // и не только им: у правила с состоянием память растёт, и увидеть,
     // что она не растёт бесконечно, стоит своими глазами.
     std::size_t pending() const { return pending_.size(); }
 
@@ -170,7 +166,7 @@ class SequenceRule : public RuleBase {
 
     std::unique_ptr<ICondition> first_;
     std::unique_ptr<ICondition> second_;
-    uint64_t window_ms_;
+    uint64_t window_ms_ = 0;
     bool same_pid_ = true;
     bool child_of_prev_ = false;
     const EntityModel* model_ = nullptr;
@@ -188,36 +184,9 @@ class SequenceRule : public RuleBase {
 //
 // Лямбда захватывает модель и остаётся выражением в одну строку. Ровно то,
 // ради чего в языке есть замыкания: поведение, которому не нужно имя.
-//
-// ОГРАНИЧЕНИЕ ФАБРИКИ, И ОНО ПОЛЕЗНОЕ
-//
-// Через MakeRule такое правило создаётся не всегда, и граница проходит
-// не там, где кажется. Формулировать её надо точно, потому что «фабрика
-// не работает с лямбдами» — неправда:
-//
-//   MakeRule<LambdaRule>(id, sev, лямбда)       СОБИРАЕТСЯ.
-//       Args выводится как тип лямбды, а лямбда, захватившая указатель,
-//       копируется. Копий получается две вместо одной, и это всё.
-//
-//   Predicate p = лямбда;
-//   MakeRule<LambdaRule>(id, sev, std::move(p)) НЕ СОБИРАЕТСЯ.
-//       Args выводится как Function. Фабрика получила свою копию move-only
-//       объекта — это законно, — а дальше передаёт её дальше копией, чего
-//       Function не умеет: внутри unique_ptr.
-//
-// То есть ломается не лямбда, а move-only аргумент. Проверить это стоит
-// компилятором, а не рассуждением: обе строки короткие, и вторая даёт
-// «use of deleted function» на unique_ptr внутри Function.
-//
-// Починка стоит одного слова и ждёт занятия 3.3: `std::move(args)...`
-// в теле фабрики — перемещения того, что фабрика уже держит по значению.
-// Идеальная передача (`std::forward`) становится доступна там же, лекция 11,
-// и этот вызов она тоже починила бы — но ничего сверх не дала бы: аргумент
-// здесь временный, а на временных обе версии совпадают. Пока правило
-// создаётся напрямую, с std::move.
 class LambdaRule : public RuleBase {
  public:
-    using Predicate = Function<bool(const Event&)>;
+    using Predicate = std::function<bool(const Event&)>;
 
     LambdaRule(const std::string& id, Severity severity, Predicate predicate);
 
@@ -322,8 +291,8 @@ class ThresholdRule : public RuleBase {
     }
 
     std::unique_ptr<ICondition> condition_;
-    std::size_t count_;
-    uint64_t window_ms_;
+    std::size_t count_ = 0;
+    uint64_t window_ms_ = 0;
     std::string key_;
     std::vector<Bucket> buckets_;
 };
