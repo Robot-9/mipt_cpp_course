@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 320" width="1060" height="320"
+     font-family="Golos Text, Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="isa" markerWidth="16" markerHeight="16" refX="14" refY="7"
+            orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L14,7 L1,13 z" fill="#0b0b0d" stroke="#dbdfe6" stroke-width="1.5"/>
+    </marker>
+    <marker id="pink" markerWidth="11" markerHeight="11" refX="10" refY="4.5"
+            orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L11,4.5 L0,9 z" fill="#ff8a8a"/>
+    </marker>
+  </defs>
+
+  <rect x="1" y="1" width="1058" height="318" rx="16" fill="#0b0b0d" stroke="#26262b"/>
+
+  <!-- ЛЕВАЯ ПАНЕЛЬ: наследование -->
+  <text x="270" y="44" font-size="18" text-anchor="middle" fill="#dbdfe6">наследование</text>
+
+  <rect x="170" y="64" width="200" height="72" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+  <text x="270" y="94" font-size="19" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">Shape</text>
+  <text x="270" y="122" font-size="16" text-anchor="middle" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">area()</text>
+
+  <rect x="60" y="210" width="180" height="72" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+  <text x="150" y="240" font-size="19" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">Circle</text>
+  <text x="150" y="268" font-size="16" text-anchor="middle" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">r_</text>
+
+  <rect x="300" y="210" width="180" height="72" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+  <text x="390" y="240" font-size="19" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">Square</text>
+  <text x="390" y="268" font-size="16" text-anchor="middle" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">a_</text>
+
+  <line x1="150" y1="210" x2="228" y2="139" stroke="#dbdfe6" stroke-width="2" marker-end="url(#isa)"/>
+  <line x1="390" y1="210" x2="312" y2="139" stroke="#dbdfe6" stroke-width="2" marker-end="url(#isa)"/>
+  <text x="176" y="170" font-size="16" text-anchor="end" fill="#80828c">is-a</text>
+  <text x="364" y="170" font-size="16" fill="#80828c">is-a</text>
+
+  <line x1="530" y1="30" x2="530" y2="290" stroke="#26262b" stroke-width="1.5"/>
+
+  <!-- ПРАВАЯ ПАНЕЛЬ: полиморфизм -->
+  <text x="790" y="44" font-size="18" text-anchor="middle" fill="#dbdfe6">полиморфизм</text>
+
+  <rect x="580" y="72" width="150" height="56" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+  <rect x="580" y="128" width="150" height="56" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+  <text x="655" y="208" font-size="15" text-anchor="middle" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">Shape* shapes[2]</text>
+
+  <circle cx="655" cy="100" r="5" fill="#ff8a8a"/>
+  <line x1="655" y1="100" x2="814" y2="100" stroke="#ff8a8a" stroke-width="2.5" marker-end="url(#pink)"/>
+  <circle cx="655" cy="156" r="5" fill="#ff8a8a"/>
+  <line x1="655" y1="156" x2="814" y2="194" stroke="#ff8a8a" stroke-width="2.5" marker-end="url(#pink)"/>
+
+  <circle cx="858" cy="100" r="36" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+  <rect x="822" y="160" width="72" height="72" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+
+  <text x="916" y="92" font-size="15" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">area():</text>
+  <text x="916" y="116" font-size="18" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">3.14·r²</text>
+  <text x="916" y="188" font-size="15" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">area():</text>
+  <text x="916" y="212" font-size="18" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">a·a</text>
+
+  <text x="790" y="282" font-size="17" text-anchor="middle" fill="#dbdfe6"
+        font-family="Consolas, Roboto Mono, monospace">for (Shape* s : shapes) s-&gt;area();</text>
+</svg>

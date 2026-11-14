@@ -56,14 +56,16 @@ class RuleBase {
     void AddAction(const std::string& action);
 
  protected:
-    // Наследник считает срабатывание сам: только он знает, когда оно
-    // случилось. Поле при этом остаётся приватным — protected-метод
-    // и protected-поле это очень разные вещи по цене.
+    // Когда правило сработало, знает только наследник, поэтому
+    // срабатывание считает он, вызывая CountHit(). Само поле hits_
+    // приватное: будь оно protected, наследник мог бы записать в него
+    // что угодно — обнулить или уменьшить. Через метод счётчик может
+    // только расти на единицу.
     void CountHit() { ++hits_; }
 
  private:
     std::string id_;
-    Severity severity_;
+    Severity severity_ = Severity::kLow;
     std::vector<std::string> actions_;
     std::size_t hits_ = 0;
 };

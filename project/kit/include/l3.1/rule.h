@@ -80,7 +80,7 @@ class RuleBase : public IRule {
 
  private:
     std::string id_;
-    Severity severity_;
+    Severity severity_ = Severity::kLow;
     std::vector<std::string> actions_;
     std::size_t hits_ = 0;
 };
@@ -90,7 +90,7 @@ class MatchRule : public RuleBase {
  public:
     MatchRule(const std::string& id, Severity severity);
 
-    // Владение условием переходит правилу. Отсюда unique_ptr в подписи:
+    // Владение условием переходит правилу. Отсюда unique_ptr в сигнатуре:
     // он говорит об этом сам, и забыть освободить условие нечем.
     void AddCondition(std::unique_ptr<ICondition> condition);
 
@@ -108,10 +108,10 @@ class MatchRule : public RuleBase {
 // проверкой одного события. «Скриптовый хост, запущенный офисным приложением»
 // — это два события, между ними время, и связь между ними по pid.
 //
-// Состояние здесь маленькое намеренно: список незавершённых совпадений
-// с временем и pid. Полноценное окно событий, три шага и связки вроде
-// child_of_prev — занятие 3.1; здесь двух шагов и same_pid достаточно, чтобы
-// увидеть, чем правило с состоянием отличается от правила без него.
+// Состояние здесь маленькое намеренно: записи первого шага с временем
+// и pid. Связка child_of_prev — занятие 3.2; здесь двух шагов и same_pid
+// достаточно, чтобы увидеть, чем правило с состоянием отличается от правила
+// без него.
 class SequenceRule : public RuleBase {
  public:
     // window_ms — сколько модельного времени второй шаг ждёт первого.
@@ -139,7 +139,7 @@ class SequenceRule : public RuleBase {
 
     std::unique_ptr<ICondition> first_;
     std::unique_ptr<ICondition> second_;
-    uint64_t window_ms_;
+    uint64_t window_ms_ = 0;
     bool same_pid_ = true;
     std::vector<Pending> pending_;
 };
@@ -239,8 +239,8 @@ class ThresholdRule : public RuleBase {
     }
 
     std::unique_ptr<ICondition> condition_;
-    std::size_t count_;
-    uint64_t window_ms_;
+    std::size_t count_ = 0;
+    uint64_t window_ms_ = 0;
     std::string key_;
     std::vector<Bucket> buckets_;
 };

@@ -143,7 +143,7 @@ TEST_CASE("копирующий конструктор события копир
     CHECK(event.type() == "process_start");
 }
 
-TEST_CASE("перемещающий конструктор события не копирует ничего") {
+TEST_CASE("move-конструктор события не копирует ничего") {
     ResetCopyStats();
 
     const Event event(MakeParts(1000, "process_start"));
@@ -177,7 +177,7 @@ TEST_CASE("битая строка не портит части до прове�
     EventParts parts = MakeParts(0, "process_start");
     parts.ts = "не число";
 
-    // Перемещающий конструктор обязан сначала проверить инвариант и только
+    // Move-конструктор обязан сначала проверить инвариант и только
     // потом забирать строки. Иначе на битой строке журнала вызывающий остался
     // бы с пустыми частями вместо своих данных — и не узнал бы об этом.
     CHECK_THROWS_AS([&] { const Event event(std::move(parts)); }(),
@@ -245,40 +245,10 @@ TEST_CASE("вытеснение в кольцевом буфере не копи
 }
 
 // ---------------------------------------------------------------------------
-// Фабрика правил и move-only аргумент
+// Фабрика правил
 // ---------------------------------------------------------------------------
 
-TEST_CASE("фабрика принимает move-only предикат") {
-    // Ровно тот вызов, который не собирался на занятии 3.2: предикат сначала
-    // собран в LambdaRule::Predicate, и только потом уезжает в фабрику.
-    // Чинится он одним словом в теле вашей MakeRule — `std::move(args)...`.
-    //
-    // Имя типа здесь не случайно. На 3.2 и 3.3 за Predicate стоит ваш
-    // Function, с 4.1 — std::move_only_function, и тест обязан пройти
-    // на обоих: он проверяет фабрику, а не то, чьё стирание типа внутри.
-    //
-    // Обратите внимание, что вызов с самой лямбдой собирался и тогда: лямбда,
-    // захватившая указатель, копируется. Ломался не «вызов с лямбдой»,
-    // а «вызов с move-only аргументом», и разница здесь принципиальна.
-    std::size_t calls = 0;
-    LambdaRule::Predicate predicate = [&calls](const Event&) {
-        ++calls;
-        return true;
-    };
-
-    auto rule = MakeRule<LambdaRule>("moved_predicate", Severity::kHigh,
-                                     std::move(predicate));
-
-    REQUIRE(rule != nullptr);
-    CHECK(rule->id() == "moved_predicate");
-
-    const Event event(MakeParts(1000, "process_start"));
-    CHECK(rule->Check(event));
-    CHECK(calls == 1);
-    CHECK(rule->hits() == 1);
-}
-
-TEST_CASE("фабрика принимает и обычную лямбду") {
+TEST_CASE("фабрика принимает лямбду") {
     auto rule = MakeRule<LambdaRule>(
         "plain_lambda", Severity::kLow,
         [](const Event& event) { return event.pid() == "1042"; });

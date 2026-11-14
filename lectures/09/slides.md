@@ -158,7 +158,27 @@ void print_all(T first, Rest... rest) {
 
 `if constexpr` (C++17) считает условие на компиляции, и **невыбранная ветка не инстанцируется**. База рекурсии не нужна.
 
-**Правило:** `if constexpr` нужен там, где ветки предъявляют разные требования к типу. Вне шаблона бесполезен.
+**Правило:** `if constexpr` нужен там, где ветки предъявляют разные требования к типу, то есть в шаблоне. Лямбда и функция с параметром `auto` — тоже шаблоны, хоть слова `template` в них нет.
+
+---
+
+## `if constexpr` вне шаблона
+
+```cpp
+constexpr bool kVerbose = false;
+
+auto describe(int pid) {
+    if constexpr (kVerbose) {
+        return std::format("process {}", pid);   // std::string
+    } else {
+        return pid;                               // int
+    }
+}
+```
+
+С обычным `if` — CE: два `return` с разными типами. Отброшенный `return` в выводе типа (template argument deduction) не участвует.
+
+Но отброшенная ветка **проверяется целиком**: `if constexpr (kLinux) { epoll_create1(0); }` на Windows — CE, имя не объявлено. Платформенный код остаётся за `#ifdef`.
 
 ---
 <!-- header: 4. Fold expressions -->
@@ -239,6 +259,23 @@ int sum0(Ts... args) {
 Без `init` унарный fold пустого пакета — это **CE** (для большинства операторов). Бинарная с `init = 0` работает корректно при любом размере пакета.
 
 ---
+
+## Цикл по пакету: `template for` (C++26)
+
+```cpp
+template <typename... Ts>
+void print_all(Ts... args) {
+    template for (auto x : {args...}) {
+        std::print("{} ", x);         // у x на каждом шаге свой тип
+    }
+}
+```
+
+Тело повторяется для каждого элемента пакета — как рекурсия, но без второй функции. В отличие от fold, в теле можно писать сколько угодно операторов.
+
+Поддержка свежая: GCC 16 под `-std=c++26`, clang 22 ещё нет. Код курса — C++23, поэтому здесь `template for` только называется.
+
+---
 <!-- header: 5. Применения -->
 
 # 5. Применения variadic в реальности
@@ -274,52 +311,97 @@ auto p = my_make_unique<Point>(3, 4);   // Point(3, 4)
 
 `args...` раскрывается в список аргументов для конструктора `T`. Один шаблон обслуживает любые типы и любое число аргументов.
 
-В настоящем `std::make_unique` используется `Args&&...` и `std::forward` — идеальная передача (perfect forwarding). Разбирается на лекции 11, раздел 8.
+Настоящий `std::make_unique` объявлен как `make_unique(Args&&... args)`. `&&` там — не rvalue-ссылка, а forwarding reference: вместе с `std::forward` она даёт идеальную передачу (perfect forwarding). Обе разбираются на лекции 11, раздел 8.
+
+---
+
+## Пакет в частичной специализации
+
+`bool(const std::string&, int)` — тип: сигнатура (signature) функции. Её разбирает паттерн частичной специализации (partial specialization):
+
+```cpp
+template <typename Signature>
+struct SignatureInfo;                     // объявлен, не определён
+
+template <typename R, typename... Args>
+struct SignatureInfo<R(Args...)> {        // R = bool, Args = {const std::string&, int}
+    using Result = R;
+    static constexpr std::size_t kArity = sizeof...(Args);
+};
+
+static_assert(SignatureInfo<bool(const std::string&, int)>::kArity == 2);
+// SignatureInfo<int> broken;             // CE: incomplete type
+```
+
+Так объявлен `std::function<int(int, int)>` (лекция 10): специализация `function<R(Args...)>` достаёт из сигнатуры типы для `operator()`.
 
 ---
 <!-- header: 6. Вывод типов -->
 
 # 6. Правила вывода типов
 
-Когда вы пишете `add(2, 3)`, компилятор **выводит** `T = int` (template argument deduction). У вывода есть несколько правил.
+Компилятор **выводит** `T` из аргумента (template argument deduction). Три шаблона `template <typename T> void f(...)` отличаются только параметром — он в заголовке столбца. Строка — вызов, ячейка — выведенный `T`:
 
-```cpp
-template <typename T>
-void f(T x);                  // by value
+| Аргумент | Вызов | `f(T x)` | `f(T& x)` | `f(const T& x)` |
+|---|---|---|---|---|
+| `int i = 5;` | `f(i)` | `int` | `int` | `int` |
+| `const int ci = 10;` | `f(ci)` | `int` | `const int` | `int` |
+| `const int& r = i;` | `f(r)` | `int` | `const int` | `int` |
+| литерал | `f(5)` | `int` | CE | `int` |
+| `const int* p = &i;` | `f(p)` | `const int*` | `const int*` | `const int*` |
+| литерал | `f("abc")` | `const char*` | `const char[4]` | `char[4]` |
 
-int i = 5;
-const int& r = i;
-f(i);     // T = int
-f(r);     // T = int (отбрасывает const и &)
-f(5);     // T = int
-```
-
-Для `T` по значению компилятор **отбрасывает** `const`/`volatile` и **ссылки**. Это называется **распад** (decay).
+Например, `f(ci)` для `f(T& x)`: `T = const int`, и параметр `x` — `const int&`.
 
 ---
 
-## Передача по `T&`
+## Что читается из таблицы
 
-```cpp
-template <typename T>
-void g(T& x);
+Ссылку у аргумента компилятор снимает первым делом: `r` для него — `const int`. Поэтому строка `r` совпадает со строкой `ci`, а не `i`.
 
-int i = 5;
-const int ci = 10;
-g(i);     // T = int, x — int&
-g(ci);    // T = const int, x — const int&
-g(5);     // CE: rvalue не привязывается к T&
-```
-
-Для `T&` const **сохраняется** (становится частью `T`). Ссылка уходит из `T`: она уже есть в сигнатуре (signature).
+- **`f(T x)` — копия.** `const` самого аргумента копии не нужен и отбрасывается: в первых четырёх строках `T = int`.
+- **`f(T& x)` — ссылка на оригинал.** `const` остаётся в `T`, иначе через `x` можно было бы изменить константу. `5` не проходит: временный объект (temporary object) к неконстантной ссылке не привязывается.
+- **`f(const T& x)` принимает всё.** `const` уже записан в параметре, поэтому в `T` его нет.
+- **Строка `p`:** константен не сам указатель, а `int`, на который он показывает. Этот `const` — часть типа и остаётся в любом столбце.
+- **Строка `"abc"`:** массив `const char[4]` по значению не передать, и `f(T x)` получает указатель — **распад** (decay), как на лекции 2. Ссылка берёт массив целиком.
 
 ---
 
-## Forwarding reference (`T&&`)
+## Вывод возвращаемого типа (C++14)
 
-![width:900px](img/reference-collapsing.svg)
+```cpp
+template <typename T, typename U>
+auto add(T a, U b) {
+    return a + b;  // тип — по обычным арифметическим преобразованиям
+}
 
-`T&&` в шаблонной функции — это **не** rvalue-ссылка, а **forwarding reference** (у Мейерса — universal reference). Передать такой параметр дальше без потери категории позволяет `std::forward` — идеальная передача, лекция 11.
+add(2, 3);        // int
+add(2, 3.0);      // double
+```
+
+Так написаны `pair_sum` на лекции 8 и `sum` из раздела 4. Правила — те же, что в столбце `f(T x)`: ссылка и `const` самого значения отбрасываются.
+
+Тело должно быть **видно в точке вызова** — значит, определение в заголовке. Несколько `return` с разными типами — CE; `return` в ветке, отброшенной `if constexpr`, не считается.
+
+---
+
+## `auto` в параметрах (C++20)
+
+```cpp
+auto add(auto a, auto b) { return a + b; }
+
+// компилятор разворачивает в:
+template <typename T, typename U>
+auto add(T a, U b) { return a + b; }
+```
+
+**Сокращённая запись шаблона** (abbreviated function template): каждое `auto` — отдельный шаблонный параметр, выводится по той же таблице. Слова `template` нет, но это шаблон, и `if constexpr` в нём работает.
+
+С концептами (concepts) — самый короткий ограниченный шаблон:
+
+```cpp
+auto sum(std::integral auto a, std::integral auto b) { return a + b; }
+```
 
 ---
 
@@ -327,7 +409,6 @@ g(5);     // CE: rvalue не привязывается к T&
 
 - Хотите, чтобы const сохранился? → `T& x` или `const T& x`
 - Хотите менять? → `T& x`
-- Принять что угодно и передать дальше? → `T&& x` и `std::forward` (лекция 11)
 - Хотите копию? → `T x` (но дорого для больших объектов)
 
 ---
@@ -337,11 +418,11 @@ g(5);     // CE: rvalue не привязывается к T&
 
 - **Variadic templates** — `template <typename... Ts>`, пакеты, раскрытие `args...`
 - **`sizeof...(args)`** — размер пакета (compile-time)
-- **`if constexpr` (C++17)** — невыбранная ветка не инстанцируется; рекурсия без второй функции
-- **Fold expressions (C++17)** — четыре формы, бинарные для пустых пакетов
+- **`if constexpr` (C++17)** — невыбранная ветка не инстанцируется; рекурсия без второй функции. Вне шаблона ветка проверяется целиком
+- **Fold expressions (C++17)** — четыре формы, бинарные для пустых пакетов; в C++26 рядом встаёт `template for`
 - **Fold по `,`** — стандартная идиома «сделай что-то для каждого»
-- **Применения:** `make_unique`, `tuple`, `format`, ваши собственные factory-функции
-- **Вывод типов:** для `T` отбрасываются `const`/`&`; для `T&` const сохраняется; `T&&` это forwarding reference (что с ней делать внутри — лекция 11)
+- **Применения:** `make_unique`, `tuple`, `format`, ваши собственные factory-функции; `R(Args...)` в частичной специализации разбирает сигнатуру
+- **Вывод типов:** для `T` отбрасываются `&` и `const` самого аргумента, массив распадается; для `T&` const сохраняется; `auto` в возврате и в параметрах — по тем же правилам
 
 ---
 

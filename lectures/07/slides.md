@@ -20,260 +20,262 @@ section {
 
 # План
 
-1. Касты при наследовании
+1. Разные правила в одном цикле
 2. Виртуальные функции
 3. `override` и `final`
 4. Абстрактные классы
 5. Виртуальный деструктор
-6. `dynamic_cast`
-7. Таблица вызовов руками
+6. Таблица вызовов руками
+7. Касты в иерархии и RTTI
 8. `enum` и `enum class`
 
 ---
-<!-- header: 1. Касты при наследовании -->
+<!-- header: 1. Разные правила в одном цикле -->
 
-# 1. Касты при наследовании
+# 1. Разные правила в одном цикле
 
-На лекции 6 мы видели **upcast** — каст (cast) для него не нужен:
+Движок проверяет каждое событие набором **правил детекта**: по имени процесса, по цепочке родителей, по частоте. Устроены правила по-разному.
+
+Хочется так:
 
 ```cpp
-class Animal { /* ... */ };
-class Dog : public Animal { /* ... */ };
+std::vector<std::unique_ptr<Rule>> rules;    // правила разных типов
 
-Dog d;
-Animal* pa = &d;       // upcast, неявный, безопасный
+void Check(const Event& e) {
+    for (const auto& rule : rules) {
+        if (rule->Matches(e)) std::print("детект: {}\n", e.process);
+    }
+}
 ```
 
-Это работает, потому что `Dog` **является** `Animal`. Адреса совпадают (`Animal` лежит в начале объекта `Dog`).
+Новое правило — новый класс, а `Check` не меняется.
 
 ---
 
-## Downcast — обратно вниз
+## Попытка средствами лекции 6
 
 ```cpp
-Animal* pa = get_some_animal();
-Dog* pd = pa;                       // CE: неявного преобразования нет
-Dog* pd = static_cast<Dog*>(pa);    // компилируется, но опасно
+struct Event {
+    std::string process{};
+};
+
+class Rule {
+public:
+    bool Matches(const Event&) const { return false; }
+};
+
+class ByNameRule : public Rule {
+public:
+    bool Matches(const Event& e) const { return e.process == "nc.exe"; }
+};
 ```
 
-Компилятор не может проверить, действительно ли `pa` указывает на `Dog`.
-
-Безопасный downcast — через `dynamic_cast` (см. дальше), но работает только для **полиморфных** классов.
+Компилируется. Событие `nc.exe` приходит — детекта нет: `rule->Matches(e)` вызывает `Rule::Matches`.
 
 ---
 
-## Взгляд на одну и ту же память
+## Что получилось и что нужно
 
-![width:900px](img/cast-direction.svg)
+![width:900px](img/binding.svg)
 
 ---
 <!-- header: 2. Виртуальные функции -->
 
 # 2. Виртуальные функции
 
+Одно слово в базе делает `Matches` **виртуальной функцией** (virtual function):
+
 ```cpp
-class Animal {
+class Rule {
 public:
-    void sound() { std::print("???\n"); }
+    virtual bool Matches(const Event&) const { return false; }
 };
 
-class Dog : public Animal {
+class ByNameRule : public Rule {
 public:
-    void sound() { std::print("woof\n"); }
+    bool Matches(const Event& e) const { return e.process == "nc.exe"; }
 };
-
-Animal* a = new Dog();
-a->sound();      // напечатает "???", не "woof"!
 ```
 
-Функция выбрана **на этапе компиляции** — **статическое связывание** (static binding). У виртуальной функции (virtual function) — иначе:
+Теперь `rule->Matches(e)` для `ByNameRule` вызывает `ByNameRule::Matches` — детект есть.
 
 ---
 
-## С `virtual` — динамическое связывание
+## Статическое и динамическое связывание
 
-```cpp
-class Animal {
-public:
-    virtual void sound() { std::print("???\n"); }
-};
+- **Статическое связывание** (static binding) — функцию выбирает компилятор по типу указателя `Rule*`. Так вызываются обычные методы
+- **Динамическое связывание** (dynamic binding) — функцию выбирает программа во время выполнения по самому объекту. Так вызываются виртуальные функции
 
-class Dog : public Animal {
-public:
-    void sound() override { std::print("woof\n"); }
-};
+Одна строка `rule->Matches(e)` вызывает разные функции для разных объектов — это и есть **полиморфизм**.
 
-Animal* a = new Dog();
-a->sound();      // теперь "woof"
-```
-
-`virtual` включает **динамическое связывание** (dynamic binding). Это и есть **полиморфизм**.
+Как программа узнаёт тип объекта — раздел 6.
 
 ---
 
-## Кто выбирает функцию
+## Только через указатель или ссылку
 
-![width:900px](img/binding.svg)
+```cpp
+ByNameRule by_name;
+
+Rule* p = &by_name;
+p->Matches(e);        // ByNameRule::Matches
+
+Rule& r = by_name;
+r.Matches(e);         // ByNameRule::Matches
+
+Rule copy = by_name;  // срезка (slicing), лекция 6
+copy.Matches(e);      // Rule::Matches: в copy лежит только Rule
+```
+
+По значению полиморфизма нет: копия базы — это объект `Rule`, и ничего, кроме `Rule`, в нём не осталось.
 
 ---
 <!-- header: 3. override / final -->
 
 # 3. `override` и `final`
 
-`override` — подсказка компилятору: «я уверен, что это переопределение (overriding)».
+Переопределение (overriding) получается только при **точном** совпадении сигнатуры (signature):
 
 ```cpp
-class Dog : public Animal {
+class ByNameRule : public Rule {
 public:
-    void sound() override { /* ok, переопределение */ }
-    void sound(int) override { /* CE: в Animal нет sound(int) */ }
-    void Sound() override { /* CE: опечатка в имени */ }
+    bool Matches(const Event& e) { return e.process == "nc.exe"; }
 };
 ```
 
-`override` не меняет семантику — это **защита** от опечаток. Без него легко создать «новую» функцию вместо переопределения.
+Забыт `const` — и это уже **другая** функция. Она не переопределяет `Rule::Matches`, а прячет её рядом. Программа компилируется, детектов снова нет.
 
-**Привычка:** всегда писать `override` на переопределённых виртуальных функциях.
+---
+
+## `override`
+
+```cpp
+class ByNameRule : public Rule {
+public:
+    bool Matches(const Event& e) const override { /* ... */ }  // ok
+    bool Matches(const Event& e) override { /* ... */ }        // CE
+    bool Match(const Event& e) const override { /* ... */ }    // CE
+};
+```
+
+`override` — обещание компилятору «это переопределение». Не совпала сигнатура или имя — ошибка компиляции, а не тихий баг.
+
+**Привычка профессионального C++:** `override` на каждом переопределении.
 
 ---
 
 ## `final`
 
-`final` запрещает дальнейшее переопределение / наследование:
+`final` запрещает переопределять дальше или наследоваться:
 
 ```cpp
-class Dog : public Animal {
+class ByNameRule : public Rule {
 public:
-    void sound() final { /* ... */ }   // никакой Puppy не сможет переопределить
+    bool Matches(const Event& e) const final { /* ... */ }
 };
 
-class Husky final : public Dog {};     // от Husky нельзя наследоваться
+class ByHashRule final : public Rule { /* ... */ };  // наследников не будет
 ```
 
-Применяется редко — в основном чтобы зафиксировать архитектуру или разрешить компилятору **devirtualization** (если он знает, что переопределений больше нет — может вызвать напрямую).
+Применяется редко: чтобы зафиксировать архитектуру или подсказать компилятору, что других переопределений нет (раздел 6, devirtualization).
 
 ---
 <!-- header: 4. Абстрактные классы -->
 
 # 4. Абстрактные классы
 
-**Чисто виртуальная функция** (pure virtual function) — виртуальная без реализации:
+Какое тело написать у `Rule::Matches`? «Правило вообще» не знает, что искать, — честного ответа у базы нет. `false` вписан, только чтобы код компилировался, и он читается как «проверено, всё чисто»:
 
 ```cpp
-class Shape {
-public:
-    virtual double area() const = 0;     // = 0 — чисто виртуальная
-    virtual ~Shape() = default;
-};
+Rule r;                       // создаётся, хотя это не правило
+r.Matches(e);                 // false: «чисто», хотя никто не проверял
+
+class ByPathRule : public Rule {};   // Matches забыли переопределить
+// в векторе правил отвечает false на любое событие
 ```
 
-`Shape` — **абстрактный класс** (abstract class): его нельзя создать напрямую.
+Обе ошибки компилируются молча. Запретить их — задача **абстрактного класса** (abstract class): базы, у которой реализации нет.
 
 ---
 
-## Конкретный наследник
+## Чисто виртуальная функция
 
 ```cpp
-class Circle : public Shape {
-    double r_;
-public:
-    Circle(double r) : r_(r) {}
-    double area() const override { return 3.14 * r_ * r_; }
-};
-
-Shape s;                          // CE: cannot instantiate abstract
-Shape* p = new Circle(5);         // ok
-std::print("{}\n", p->area());    // 78.5
-```
-
-`Circle` переопределил все чисто виртуальные методы — теперь это конкретный класс.
-
----
-
-## Зачем нужны абстрактные
-
-Абстрактные классы — это **интерфейсы**: описание контракта без реализации.
-
-```cpp
-class Rule {                              // правило детектирования
+class Rule {
 public:
     virtual bool Matches(const Event& e) const = 0;
-    virtual std::string_view Name() const = 0;
-    virtual ~Rule() = default;
 };
 ```
 
-Это аналог `interface` в Java и `abstract class` с `ABC` в Python. Если наследник не переопределил все чисто виртуальные — он тоже абстрактный.
-
----
-
-## Зачем это на практике
-
-Правил много, движок проверки один — и он не должен меняться от появления нового правила.
+`= 0` — **чисто виртуальная функция** (pure virtual function): реализации нет, наследник обязан её дать.
 
 ```cpp
-std::vector<std::unique_ptr<Rule>> rules;
-
-void Check(const Event& e) {
-    for (const auto& rule : rules) {
-        if (rule->Matches(e)) Alert(rule->Name());
-    }
-}
+Rule r;                                      // CE: Rule — абстрактный
+auto p = std::make_unique<ByNameRule>();     // ok
 ```
 
-Добавить новое правило — значит добавить класс, **не трогая** `Check`.
+Класс с чисто виртуальной функцией — **абстрактный**, объект его создать нельзя. Наследник, не переопределивший её, тоже абстрактный.
 
 ---
 
-## Разные типы в одном списке
+## Интерфейс
 
-![width:900px](img/rule-vector.svg)
+Абстрактный класс без данных — **интерфейс**: контракт без реализации. Аналог `interface` в Java и `ABC` в Python.
+
+```cpp
+class ByNameRule : public Rule {
+public:
+    ByNameRule(const std::string& name) : name_(name) {}
+    bool Matches(const Event& e) const override {
+        return e.process == name_;
+    }
+
+private:
+    std::string name_{};
+};
+```
+
+`Check` из раздела 1 знает только `Rule` — и работает с любым наследником.
 
 ---
 <!-- header: 5. Виртуальный деструктор -->
 
 # 5. Виртуальный деструктор
 
-Опасная ситуация:
+В коде раздела 1 есть UB. Пусть правило владеет списком имён:
 
 ```cpp
-class Animal {
+class ByNameRule : public Rule {
 public:
-    ~Animal() { /* НЕ virtual */ }
+    bool Matches(const Event& e) const override;
+
+private:
+    std::vector<std::string> names_{};   // буфер в куче
 };
 
-class Dog : public Animal {
-    std::unique_ptr<Buffer> buf_;
-public:
-    ~Dog() { /* должен освободить buf_, но... */ }
-};
-
-Animal* a = new Dog();
-delete a;        // вызовется только ~Animal() → ~Dog() пропущен → UB
+{
+    std::vector<std::unique_ptr<Rule>> rules;
+    rules.push_back(std::make_unique<ByNameRule>());
+}   // delete через Rule* — деструктор выбран по типу указателя
 ```
 
-Через указатель на базу вызывается только `~Animal()`.
+Вызван только деструктор базы, деструктор наследника пропущен — это **UB**, на практике утечка памяти (memory leak): `names_` никто не освободит.
 
 ---
 
 ## Решение — `virtual`
 
 ```cpp
-class Animal {
+class Rule {
 public:
-    virtual ~Animal() = default;     // вот так
+    virtual ~Rule() = default;
+    virtual bool Matches(const Event& e) const = 0;
 };
-
-class Dog : public Animal {
-public:
-    ~Dog() override { /* ... */ }
-};
-
-Animal* a = new Dog();
-delete a;        // теперь вызовутся ~Dog(), затем ~Animal()
 ```
 
-**Жёсткое правило:** если в классе есть **любая** виртуальная функция — у него **должен** быть виртуальный деструктор. Без исключений.
+Теперь `delete` через `Rule*` вызывает `~ByNameRule()`, затем `~Rule()`.
+
+**Правило:** если в классе есть **любая** виртуальная функция — деструктор виртуальный. Без исключений.
 
 ---
 
@@ -282,75 +284,27 @@ delete a;        // теперь вызовутся ~Dog(), затем ~Animal()
 ![width:900px](img/virtual-dtor.svg)
 
 ---
-<!-- header: 6. dynamic_cast -->
+<!-- header: 6. Таблица вызовов руками -->
 
-# 6. `dynamic_cast`
-
-`dynamic_cast` — единственный **безопасный** downcast. Проверяет реальный тип объекта в рантайме:
-
-```cpp
-Animal* a = get_some_animal();
-
-Dog* d = dynamic_cast<Dog*>(a);
-if (d) {
-    d->bark();                       // это действительно Dog
-} else {
-    /* не Dog, например, Cat */
-}
-```
-
-Если `a` реально указывает на `Dog` — возвращает указатель. Иначе — `nullptr`.
-
----
-
-## Со ссылкой — исключение
-
-Для **ссылок** `dynamic_cast` бросает `std::bad_cast` (нельзя вернуть «ничего»):
-
-```cpp
-try {
-    Dog& d = dynamic_cast<Dog&>(*a);
-    d.bark();
-} catch (const std::bad_cast&) {
-    /* не Dog */
-}
-```
-
-Работает только для **полиморфных** классов — у которых есть хотя бы одна виртуальная функция (включая виртуальный деструктор).
-
----
-
-## Когда использовать
-
-В **хорошо спроектированном** OOP-коде `dynamic_cast` встречается **редко**. Обычно правильно — иметь виртуальную функцию.
-
-Уместен, когда:
-
-- Нужно реализовать **visitor** / RTTI-механизм
-- Совместимость с библиотекой, возвращающей базовый тип
-- Гетерогенная коллекция с гетерогенной обработкой (вынужденно)
-
-Если в коде много `dynamic_cast` — пора пересмотреть дизайн.
-
----
-<!-- header: 7. Таблица вызовов руками -->
-
-# 7. Таблица вызовов руками
+# 6. Таблица вызовов руками
 
 `virtual` — не магия компилятора. Тот же механизм — vtable — собирается на обычном C++.
 
 ```cpp
 struct Animal;                   // нужен для сигнатур в таблице
 
+using AnimalSoundFn = const char*(*)(const Animal* self);
+using AnimalAgeFn   = int(*)(const Animal* self);
+
 struct AnimalOps {               // таблица методов
-    const char* (*sound)(const Animal* self);
-    int (*human_age)(const Animal* self);
+    AnimalSoundFn sound{};
+    AnimalAgeFn   human_age{};
 };
 
 struct Animal {
-    const AnimalOps* ops;        // первое поле — указатель на таблицу
-    const char* name;
-    int age_years;
+    const AnimalOps* ops{};      // первое поле — указатель на таблицу
+    const char* name{};
+    int age_years{};
 };
 ```
 
@@ -361,11 +315,17 @@ struct Animal {
 ```cpp
 const char* dog_sound(const Animal*) { return "woof"; }
 int dog_human_age(const Animal* self) { return self->age_years * 7; }
-constexpr AnimalOps kDogOps{dog_sound, dog_human_age};
+constexpr AnimalOps kDogOps{
+    dog_sound,
+    dog_human_age
+};
 
 const char* bird_sound(const Animal*) { return "tweet"; }
 int bird_human_age(const Animal* self) { return self->age_years * 5; }
-constexpr AnimalOps kBirdOps{bird_sound, bird_human_age};
+constexpr AnimalOps kBirdOps{
+    bird_sound,
+    bird_human_age
+};
 ```
 
 `self` — это `this`, написанный руками: через него реализация читает поля объекта.
@@ -406,9 +366,10 @@ public:
     virtual const char* sound() const = 0;
     virtual int human_age() const = 0;
     const char* name() const { return name_; }
+
 protected:
-    const char* name_;
-    int age_years_;
+    const char* name_{};
+    int age_years_{};
 };
 ```
 
@@ -445,16 +406,35 @@ void describe(const Animal& a) {
 
 ---
 
+## Виртуальный вызов в конструкторе
+
+```cpp
+struct Base {
+    Base() { hello(); }
+    virtual ~Base() { hello(); }
+    virtual void hello() const { std::print("Base\n"); }
+};
+struct Derived : Base {
+    void hello() const override { std::print("Derived: {}\n", name_); }
+    std::string name_{"ready"};
+};
+Derived d;   // Base при создании, Base при уничтожении
+```
+
+![width:820px](img/ctor-dtor-vptr.svg)
+
+---
+
 ## `sizeof`: что добавляет `virtual`
 
 ```cpp
 struct Plain {
-    int age_years;
+    int age_years{};
     void sound() const {}
 };
 
 struct Polymorphic {
-    int age_years;
+    int age_years{};
     virtual void sound() const {}
     virtual ~Polymorphic() = default;
 };
@@ -462,7 +442,7 @@ struct Polymorphic {
 std::print("{} {}\n", sizeof(Plain), sizeof(Polymorphic));   // 4 16
 ```
 
-**Таблица одна на класс:** добавьте ещё девять виртуальных функций — `sizeof` останется 16.
+**Таблица одна на класс:** добавьте ещё девять виртуальных функций — `sizeof` останется 16. Описание типа для RTTI (раздел 7) тоже лежит в таблице, а не в объекте.
 
 ---
 
@@ -474,13 +454,11 @@ std::print("{} {}\n", sizeof(Plain), sizeof(Polymorphic));   // 4 16
 
 ## Цена
 
-- **Память:** +8 байт на объект (64 бита). Для класса с парой `int` — утроение размера, для класса на сотню байт — незаметно
-- **Время:** одна дополнительная косвенность; предсказатель переходов почти всегда угадывает цель
-- **Встраивание** (inlining) невозможно, а с ним уходят свёртка констант (constant folding), устранение проверок, векторизация (vectorization)
+- **Память:** +8 байт на объект — `vptr`, и к ним может добавиться padding: `vptr` выравнивается по 8, поэтому `Polymorphic` с одним `int` весит 16, а не 12
+- **Время:** перед вызовом адрес функции читается из таблицы — одно лишнее чтение памяти
+- **Встраивание** (inlining): компилятор не знает, какая функция вызовется, и не может подставить её тело на место вызова
 
-**Подвох:** «виртуальный вызов медленный» — не про сам вызов, а про барьер для оптимизаций вокруг него.
-
-В Java и Python виртуально почти всё. В C++ — только там, где написано `virtual`.
+Третье обычно дороже первых двух. Но заметно это только в горячих циклах на миллионы вызовов; в остальном коде цена `virtual` теряется.
 
 ---
 
@@ -490,12 +468,89 @@ std::print("{} {}\n", sizeof(Plain), sizeof(Polymorphic));   // 4 16
 
 ```cpp
 Dog d{"Sharik", 3};
-d.sound();      // тип известен точно → прямой вызов, можно заинлайнить
+d.sound();      // тип известен точно → прямой вызов, можно встроить
 ```
 
-Помогают `final` и создание объекта рядом с вызовом. Но объект, пришедший по `Animal&` из другой единицы трансляции (translation unit), доказать нечем — вызов остаётся косвенным.
+Помогают `final` и создание объекта рядом с вызовом. Объект, пришедший по `Animal&` из другой единицы трансляции (translation unit), доказать нечем — вызов остаётся косвенным.
 
 Полагаться на devirtualization в дизайне не стоит: это оптимизация, а не гарантия.
+
+---
+<!-- header: 7. Касты в иерархии и RTTI -->
+
+# 7. Касты в иерархии и RTTI
+
+**Upcast** — от наследника к базе — неявный, каст (cast) не нужен (лекция 6): `Dog` **является** `Animal`.
+
+```cpp
+Dog d;
+Animal* pa = &d;                     // upcast
+```
+
+**Downcast** — обратно вниз — компилятор проверить не может:
+
+```cpp
+Animal* pa = get_some_animal();
+Dog* pd = pa;                        // CE: неявного преобразования нет
+Dog* pd = static_cast<Dog*>(pa);     // компилируется; не Dog — UB
+```
+
+---
+
+## Взгляд на одну и ту же память
+
+![width:900px](img/cast-direction.svg)
+
+---
+
+## `dynamic_cast`
+
+Проверяет реальный тип объекта во время выполнения:
+
+```cpp
+Animal* a = get_some_animal();
+
+if (Dog* d = dynamic_cast<Dog*>(a)) {
+    d->bark();                       // это действительно Dog
+} else {
+    /* не Dog, например Cat */
+}
+```
+
+Для **ссылок** «ничего» вернуть нельзя — бросается `std::bad_cast`:
+
+```cpp
+Dog& d = dynamic_cast<Dog&>(*a);     // не Dog → исключение
+```
+
+---
+
+## RTTI
+
+Откуда `dynamic_cast` знает тип? Компилятор кладёт рядом с vtable описание класса — **RTTI** (run-time type information). Добраться до него можно и напрямую:
+
+```cpp
+#include <typeinfo>
+
+if (typeid(*a) == typeid(Dog)) { /* ... */ }
+std::print("{}\n", typeid(*a).name());   // в GCC: "3Dog"
+```
+
+- Работает только для **полиморфных** классов: нет vtable — негде хранить
+- В объекте места не занимает: путь к описанию — тот же `vptr`
+
+---
+
+## Когда использовать
+
+Обычно `dynamic_cast` не нужен: вместо «проверить, что это `Dog`, и вызвать `bark`» — виртуальная функция `sound`.
+
+Уместен, когда:
+
+- Библиотека отдаёт базовый тип, а нужен конкретный
+- У одного наследника есть операция, которой нет в интерфейсе
+
+**Правило:** много `dynamic_cast` в коде — сигнал пересмотреть дизайн. Обычно цепочка проверок заменяется одной виртуальной функцией.
 
 ---
 <!-- header: 8. enum class -->
@@ -542,15 +597,13 @@ int y = static_cast<int>(Color::Red);   // ok
 
 # Итоги лекции
 
-- **Касты в иерархии:** upcast неявный, downcast только через `dynamic_cast`
-- **Виртуальные функции** дают полиморфизм во время выполнения. Всегда писать `override`
-- **`final`** запрещает дальнейшее переопределение/наследование (редко)
-- **Чисто виртуальные** (`= 0`) делают класс **абстрактным** — нельзя создать напрямую
-- **Виртуальный деструктор обязателен**, если класс полиморфный
-- **`dynamic_cast`** — безопасный downcast. Много его в коде = плохой дизайн
+- **Виртуальные функции** выбирают реализацию по объекту, а не по типу указателя: один цикл по `Rule*` — разные правила
+- **`override`** превращает опечатку в сигнатуре в CE. **`final`** запрещает переопределять дальше (редко)
+- **Чисто виртуальные** (`= 0`) делают класс **абстрактным** — интерфейсом, который нельзя создать
+- **Виртуальный деструктор обязателен**, если в классе есть любая виртуальная функция
 - **vtable/vptr** собираются руками на обычном C++ — `virtual` делает ровно это
-- **Таблица одна на класс:** `sizeof` растёт на 8 байт, а не на функцию
-- **Цена** — лишняя косвенность и потеря встраивания; devirtualization не гарантирована
+- **Таблица одна на класс:** объект растёт на 8 байт; главная цена — потеря встраивания
+- **Downcast** — только `dynamic_cast`, он работает на RTTI. Много его в коде — плохой дизайн
 - **`enum class`** — единственный enum для нового кода
 
 ---

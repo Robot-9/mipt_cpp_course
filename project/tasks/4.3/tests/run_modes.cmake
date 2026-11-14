@@ -58,7 +58,7 @@ foreach(run RANGE 0 ${last})
     string(REPLACE "\r\n" "\n" thread_out "${thread_out}")
 
     if(NOT thread_out STREQUAL inline_out)
-        # Первая расхождение — на него и стоит смотреть.
+        # Первое расхождение — на него и стоит смотреть.
         string(REPLACE "\n" ";" thread_lines "${thread_out}")
         string(REPLACE "\n" ";" inline_lines "${inline_out}")
         list(LENGTH thread_lines thread_count)

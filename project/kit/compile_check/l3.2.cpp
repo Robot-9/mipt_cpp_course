@@ -1,6 +1,6 @@
 // Заготовки занятия 3.2. См. l1.2.cpp.
 //
-// Появились стирание типа, детект как тип, получатели, вторая граница
+// Появились type erasure, детект как тип, получатели, вторая граница
 // и модель сущностей.
 
 #include "alert_sink.h"
@@ -14,7 +14,7 @@
 #include "event_source.h"
 #include "field_traits.h"
 #include "fields.h"
-#include "function.h"
+#include "file_stream.h"
 #include "os_handle.h"
 #include "parse.h"
 #include "ring_buffer.h"

@@ -1,0 +1,310 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1230" width="1080" height="1230"
+     font-family="Golos Text, Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="flow" markerWidth="11" markerHeight="11" refX="10" refY="4.5"
+            orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L11,4.5 L0,9 z" fill="#dbdfe6"/>
+    </marker>
+    <marker id="pink" markerWidth="11" markerHeight="11" refX="10" refY="4.5"
+            orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L11,4.5 L0,9 z" fill="#ff8a8a"/>
+    </marker>
+  </defs>
+
+  <rect x="1" y="1" width="1078" height="1228" rx="16" fill="#0b0b0d" stroke="#26262b"/>
+
+  <!-- ================= легенда ================= -->
+  <g id="ownership" font-size="13" font-family="Consolas, Roboto Mono, monospace">
+    <text x="40" y="45" font-size="13" fill="#5c5e66"
+          font-family="Golos Text, Segoe UI, Helvetica, Arial, sans-serif">файлы:</text>
+
+    <rect x="100" y="28" width="104" height="24" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="152" y="45" text-anchor="middle" fill="#80828c">комплект</text>
+
+    <rect x="216" y="28" width="112" height="24" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="272" y="45" text-anchor="middle" fill="#ffffff">копируете</text>
+
+    <rect x="340" y="28" width="112" height="24" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="396" y="45" text-anchor="middle" fill="#dbdfe6">меняете</text>
+
+    <rect x="464" y="28" width="132" height="24" fill="#dbdfe6"/>
+    <text x="530" y="45" text-anchor="middle" fill="#0b0b0d" font-weight="bold">пишете с нуля</text>
+  </g>
+  <text x="616" y="45" font-size="13" fill="#5c5e66">комплект менять нельзя; остальное — ваш src/</text>
+
+  <text x="40" y="78" font-size="13" fill="#5c5e66">связи:</text>
+  <line x1="100" y1="73" x2="150" y2="73" stroke="#ff8a8a" stroke-width="2.5" marker-end="url(#pink)"/>
+  <text x="160" y="78" font-size="13" fill="#80828c">хранит в поле</text>
+  <line x1="290" y1="73" x2="340" y2="73" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="350" y="78" font-size="13" fill="#80828c">вызывает</text>
+
+  <line x1="40" y1="96" x2="1040" y2="96" stroke="#26262b" stroke-width="1"/>
+
+  <!-- ================= ряд A: main, Agent, набор правил ================= -->
+  <rect x="40" y="112" width="220" height="170" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="150" y="142" font-size="20" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">main</text>
+  <line x1="56" y1="156" x2="244" y2="156" stroke="#26262b" stroke-width="1"/>
+  <text x="58" y="180" font-size="13" fill="#80828c">флаги --dry-run и --copies;</text>
+  <text x="58" y="199" font-size="13" fill="#80828c">каталог карантина от сервера</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="58" y="230" width="80" height="26" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="98" y="248" text-anchor="middle" fill="#dbdfe6">main.cpp</text>
+  </g>
+
+  <line x1="260" y1="170" x2="354" y2="170" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="307" y="162" font-size="11" text-anchor="middle" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">EnableResponse</text>
+
+  <rect x="360" y="112" width="320" height="170" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="520" y="140" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">Agent : IEventHandler</text>
+  <text x="376" y="168" font-size="12" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">window_ : RingBuffer&lt;WindowEntry, 256&gt;</text>
+  <text x="376" y="188" font-size="12" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">model_  engine_  planner_  responder_</text>
+  <text x="376" y="212" font-size="12" fill="#80828c">своё событие идёт в модель, но не в правила</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="376" y="230" width="76" height="26" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="414" y="248" text-anchor="middle" fill="#dbdfe6">agent.h</text>
+    <rect x="462" y="230" width="92" height="26" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="508" y="248" text-anchor="middle" fill="#dbdfe6">agent.cpp</text>
+  </g>
+
+  <line x1="680" y1="150" x2="774" y2="150" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="727" y="142" font-size="11" text-anchor="middle" fill="#80828c">заполняет</text>
+
+  <rect x="780" y="112" width="260" height="170" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="910" y="140" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">набор правил</text>
+  <text x="910" y="166" font-size="12" text-anchor="middle" fill="#80828c">девять правил; у каждого —</text>
+  <text x="910" y="184" font-size="12" text-anchor="middle" fill="#80828c">слова действий для плана</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="796" y="212" width="134" height="26" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="863" y="230" text-anchor="middle" fill="#dbdfe6">agent_rules.cpp</text>
+    <rect x="796" y="246" width="108" height="26" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="850" y="264" text-anchor="middle" fill="#dbdfe6">make_rule.h</text>
+  </g>
+
+  <!-- связи из ряда A вниз -->
+  <line x1="150" y1="282" x2="150" y2="334" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="160" y="313" font-size="11" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">source-&gt;os()</text>
+
+  <line x1="440" y1="282" x2="440" y2="334" stroke="#ff8a8a" stroke-width="2.5" marker-end="url(#pink)"/>
+  <text x="450" y="313" font-size="11" fill="#ff8a8a"
+        font-family="Consolas, Roboto Mono, monospace">engine_</text>
+
+  <!-- responder_: обход слева -->
+  <path d="M 360 262 L 318 262 L 318 640 L 354 640" fill="none" stroke="#ff8a8a" stroke-width="2.5"
+        marker-end="url(#pink)"/>
+  <text x="312" y="543" font-size="11" text-anchor="end" fill="#ff8a8a"
+        font-family="Consolas, Roboto Mono, monospace">responder_</text>
+
+  <!-- planner_: обход справа -->
+  <path d="M 680 262 L 760 262 L 760 640 L 774 640" fill="none" stroke="#ff8a8a" stroke-width="2.5"
+        marker-end="url(#pink)"/>
+  <text x="754" y="543" font-size="11" text-anchor="end" fill="#ff8a8a"
+        font-family="Consolas, Roboto Mono, monospace">planner_</text>
+
+  <!-- ================= ряд B: OsSource, RuleEngine, Detection ================= -->
+  <rect x="40" y="340" width="220" height="170" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="150" y="368" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">OsSource</text>
+  <text x="150" y="388" font-size="12" text-anchor="middle" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">: IEventSource</text>
+  <text x="58" y="414" font-size="12" fill="#80828c">os() отдаёт свою границу</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="58" y="440" width="88" height="26" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="102" y="458" text-anchor="middle" fill="#dbdfe6">sources.h</text>
+    <rect x="58" y="474" width="104" height="26" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="110" y="492" text-anchor="middle" fill="#dbdfe6">sources.cpp</text>
+  </g>
+
+  <rect x="360" y="340" width="320" height="170" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="520" y="368" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">RuleEngine</text>
+  <text x="520" y="396" font-size="12" text-anchor="middle" fill="#80828c">в детект кладёт копию события-улики:</text>
+  <text x="520" y="414" font-size="12" text-anchor="middle" fill="#80828c">одна копия на детект, а не на событие</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="376" y="440" width="116" height="26" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="434" y="458" text-anchor="middle" fill="#80828c">rule_engine.h</text>
+    <rect x="502" y="440" width="134" height="26" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="569" y="458" text-anchor="middle" fill="#dbdfe6">rule_engine.cpp</text>
+  </g>
+
+  <line x1="680" y1="400" x2="774" y2="400" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="719" y="392" font-size="10" text-anchor="middle" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">MakeDetection</text>
+
+  <rect x="780" y="340" width="260" height="170" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="910" y="368" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">Detection</text>
+  <text x="796" y="392" font-size="12" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">evidence — улики</text>
+  <text x="796" y="411" font-size="12" fill="#80828c">копирование запрещено; получатель</text>
+  <text x="796" y="429" font-size="12" fill="#80828c">хранит снимок SeenAlert</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="796" y="442" width="104" height="26" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="848" y="460" text-anchor="middle" fill="#80828c">detection.h</text>
+    <rect x="908" y="442" width="112" height="26" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="964" y="460" text-anchor="middle" fill="#80828c">alert_sink.h</text>
+    <rect x="796" y="476" width="92" height="26" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="842" y="494" text-anchor="middle" fill="#dbdfe6">sinks.cpp</text>
+  </g>
+
+  <!-- связи из ряда B вниз -->
+  <line x1="150" y1="510" x2="150" y2="562" stroke="#ff8a8a" stroke-width="2.5" marker-end="url(#pink)"/>
+  <text x="160" y="541" font-size="11" fill="#ff8a8a"
+        font-family="Consolas, Roboto Mono, monospace">handle_</text>
+
+  <!-- ================= ряд C: OsHandle, Responder, ResponsePlanner ================= -->
+  <rect x="40" y="568" width="220" height="170" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="150" y="596" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">OsHandle</text>
+  <text x="58" y="622" font-size="12" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">Kill  MoveFile</text>
+  <text x="58" y="640" font-size="12" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">DeleteFile  ProcessInfo</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="58" y="668" width="104" height="26" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="110" y="686" text-anchor="middle" fill="#80828c">os_handle.h</text>
+    <rect x="58" y="702" width="120" height="26" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="118" y="720" text-anchor="middle" fill="#dbdfe6">os_handle.cpp</text>
+  </g>
+
+  <line x1="360" y1="700" x2="266" y2="700" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="313" y="680" font-size="10" text-anchor="middle" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">Kill, MoveFile,</text>
+  <text x="313" y="692" font-size="10" text-anchor="middle" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">DeleteFile</text>
+
+  <rect x="360" y="568" width="320" height="170" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="520" y="596" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">Responder</text>
+  <text x="376" y="622" font-size="12" fill="#80828c">Execute: повтор цели отбрасывается,</text>
+  <text x="376" y="640" font-size="12" fill="#80828c">в --dry-run только печать [PLAN]</text>
+  <text x="376" y="658" font-size="12" fill="#80828c">Recognize: своё ли это событие</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="376" y="676" width="96" height="26" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="424" y="694" text-anchor="middle" fill="#80828c">response.h</text>
+    <rect x="482" y="676" width="116" height="26" fill="#dbdfe6"/>
+    <text x="540" y="694" text-anchor="middle" fill="#0b0b0d" font-weight="bold">response.cpp</text>
+  </g>
+
+  <rect x="780" y="568" width="260" height="170" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="910" y="596" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">ResponsePlanner</text>
+  <text x="796" y="622" font-size="12" fill="#80828c">про os.h не знает;</text>
+  <text x="796" y="640" font-size="12" fill="#80828c">план — по детекту и модели</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="796" y="668" width="96" height="26" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="844" y="686" text-anchor="middle" fill="#80828c">response.h</text>
+    <rect x="900" y="668" width="116" height="26" fill="#dbdfe6"/>
+    <text x="958" y="686" text-anchor="middle" fill="#0b0b0d" font-weight="bold">response.cpp</text>
+  </g>
+
+  <!-- планировщик читает детект -->
+  <line x1="910" y1="568" x2="910" y2="516" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="920" y="545" font-size="11" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">actions, evidence</text>
+
+  <!-- связи из ряда C вниз -->
+  <line x1="520" y1="738" x2="520" y2="790" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="530" y="769" font-size="11" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">actions()</text>
+
+  <line x1="800" y1="738" x2="686" y2="808" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="760" y="790" font-size="11" text-anchor="end" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">Add</text>
+
+  <line x1="910" y1="738" x2="910" y2="790" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="920" y="769" font-size="11" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">GetFilesCreatedBy</text>
+
+  <!-- ================= ряд D: тесты, ResponsePlan, EntityModel ================= -->
+  <rect x="40" y="796" width="220" height="170" fill="none" stroke="#80828c" stroke-width="1.5"/>
+  <text x="150" y="822" font-size="14" text-anchor="middle" fill="#80828c">выданные тесты</text>
+  <text x="56" y="848" font-size="13" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">move_tests.cpp</text>
+  <text x="56" y="866" font-size="12" fill="#5c5e66">→ правило пяти, счётчик, фабрика</text>
+  <text x="56" y="892" font-size="13" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">response_tests.cpp</text>
+  <text x="56" y="910" font-size="12" fill="#5c5e66">→ план без симулятора</text>
+  <text x="56" y="936" font-size="13" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">copies.cpp</text>
+  <text x="56" y="954" font-size="12" fill="#5c5e66">→ упражнение: цена копии</text>
+
+  <rect x="360" y="796" width="320" height="170" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="520" y="824" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">ResponsePlan, Action</text>
+  <text x="376" y="850" font-size="12" fill="#80828c">Add: одна цель — одно действие,</text>
+  <text x="376" y="868" font-size="12" fill="#80828c">при повторе цели побеждает первое;</text>
+  <text x="376" y="886" font-size="12" fill="#80828c">ToString — тело строки [PLAN]</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="376" y="904" width="96" height="26" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="424" y="922" text-anchor="middle" fill="#80828c">response.h</text>
+    <rect x="482" y="904" width="150" height="26" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="557" y="922" text-anchor="middle" fill="#ffffff">response_plan.cpp</text>
+  </g>
+
+  <rect x="780" y="796" width="260" height="170" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="910" y="824" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">EntityModel</text>
+  <text x="796" y="850" font-size="12" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">from_move</text>
+  <text x="870" y="850" font-size="12" fill="#80828c">— путь появился</text>
+  <text x="796" y="868" font-size="12" fill="#80828c">переименованием, а не записью</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="796" y="896" width="124" height="26" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="858" y="914" text-anchor="middle" fill="#80828c">entity_model.h</text>
+    <rect x="796" y="930" width="140" height="26" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="866" y="948" text-anchor="middle" fill="#dbdfe6">entity_model.cpp</text>
+  </g>
+
+  <!-- ================= ряд E: CopyStats, окно, Event ================= -->
+  <rect x="40" y="1024" width="220" height="170" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="150" y="1052" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">CopyStats</text>
+  <text x="58" y="1078" font-size="12" fill="#80828c">копии и перемещения;</text>
+  <text x="58" y="1096" font-size="12" fill="#80828c">печать по флагу --copies</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="58" y="1124" width="112" height="26" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="114" y="1142" text-anchor="middle" fill="#80828c">copy_stats.h</text>
+    <rect x="58" y="1158" width="128" height="26" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="122" y="1176" text-anchor="middle" fill="#ffffff">copy_stats.cpp</text>
+  </g>
+
+  <line x1="360" y1="1110" x2="266" y2="1110" stroke="#dbdfe6" stroke-width="2" marker-end="url(#flow)"/>
+  <text x="313" y="1102" font-size="10" text-anchor="middle" fill="#80828c"
+        font-family="Consolas, Roboto Mono, monospace">copy_stats()</text>
+
+  <rect x="360" y="1024" width="320" height="170" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="520" y="1052" font-size="15" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">RingBuffer&lt;WindowEntry, 256&gt;</text>
+  <text x="376" y="1078" font-size="12" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">PushBack(const T&amp;)  PushBack(T&amp;&amp;)</text>
+  <text x="376" y="1096" font-size="12" fill="#80828c">у WindowEntry четыре функции руками</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="376" y="1124" width="116" height="26" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="434" y="1142" text-anchor="middle" fill="#dbdfe6">ring_buffer.h</text>
+    <rect x="502" y="1124" width="124" height="26" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="564" y="1142" text-anchor="middle" fill="#ffffff">window_entry.h</text>
+  </g>
+
+  <rect x="780" y="1024" width="260" height="170" fill="rgba(255,255,255,0.04)" stroke="#3a3a40" stroke-width="1.5"/>
+  <text x="910" y="1052" font-size="17" text-anchor="middle" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">Event</text>
+  <text x="796" y="1078" font-size="12" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">Event(const EventParts&amp;)</text>
+  <text x="796" y="1096" font-size="12" fill="#ffffff"
+        font-family="Consolas, Roboto Mono, monospace">Event(EventParts&amp;&amp;)</text>
+  <text x="796" y="1114" font-size="12" fill="#80828c">пять функций — от компилятора</text>
+  <g font-family="Consolas, Roboto Mono, monospace" font-size="13">
+    <rect x="796" y="1136" width="80" height="26" fill="none" stroke="#80828c" stroke-width="1.5"/>
+    <text x="836" y="1154" text-anchor="middle" fill="#80828c">event.h</text>
+    <rect x="886" y="1136" width="96" height="26" fill="rgba(255,255,255,0.05)" stroke="#dbdfe6" stroke-width="2"/>
+    <text x="934" y="1154" text-anchor="middle" fill="#dbdfe6">event.cpp</text>
+  </g>
+
+</svg>

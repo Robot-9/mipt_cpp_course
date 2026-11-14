@@ -380,9 +380,6 @@ std::visit([](const auto& x) {
 ```cpp
 template <typename... Ts>
 struct overload : Ts... { using Ts::operator()...; };
-
-template <typename... Ts>
-overload(Ts...) -> overload<Ts...>;   // deduction guide
 ```
 
 `overload` наследуется от всех лямбд и через `using Ts::operator()...` собирает их `operator()` в один класс. Получается тип с несколькими перегрузками.

@@ -19,15 +19,15 @@
 // один и тот же прогон даёт то одно, то вдвое большее, смотря как легли узлы
 // в куче. Время буфера не меняется, и это тоже результат.
 //
-// Сборка — из каталога, где лежит этот файл:
-//   g++ -std=c++23 -O2 -Wall -Wextra -I ../../../src -o window window.cpp
-//   cl /nologo /std:c++latest /O2 /W4 /EHsc /I ..\..\..\src window.cpp
-//
-// Ключ -I (у cl это /I) указывает, где искать ring_buffer.h: путь ведёт
-// в src/ вашего проекта.
+// Сборка — своей целью, из корня проекта:
+//   cmake --build --preset windows --target window
+//   ./build/windows/Release/window
+// На Linux — --preset linux и ./build/linux/window. ring_buffer.h цель
+// берёт из src/ вашего проекта, с остальным вашим кодом стенд не связан.
 //
 // Только Release: в отладочной сборке ничего не встроено, и сравнение
-// измеряет работу отладочных проверок, а не структур данных.
+// измеряет работу отладочных проверок, а не структур данных. Пресеты
+// windows и linux так и собирают.
 
 #include <chrono>
 #include <cstddef>
@@ -135,7 +135,7 @@ class SimpleList {
     std::unique_ptr<Node> head_;
     Node* tail_ = nullptr;
     std::size_t size_ = 0;
-    std::size_t capacity_;
+    std::size_t capacity_ = 0;
 };
 
 // ---------------------------------------------------------------------------

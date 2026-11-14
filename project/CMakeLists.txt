@@ -65,7 +65,7 @@ option(NANO_EDR_TSAN     "Собрать с ThreadSanitizer"       OFF)
 # ---------------------------------------------------------------------------
 #
 # Наборы прошлых занятий подключаются вместе с нынешним: рефакторинг, задевший
-# чужое, обязан провалить их. Но три файла в прошлых наборах проверяют
+# чужое, обязан провалить их. Но два файла в прошлых наборах проверяют
 # контракт, который позднейшие занятия заменяют по заданию, и после замены
 # перестают компилироваться.
 #
@@ -74,8 +74,6 @@ option(NANO_EDR_TSAN     "Собрать с ThreadSanitizer"       OFF)
 
 option(NANO_EDR_NO_EVENT_LIST
        "Не собирать тесты односвязного списка (с занятия 4.1)" OFF)
-option(NANO_EDR_NO_OWN_FUNCTION
-       "Не собирать тесты своего Function (с занятия 4.1)" OFF)
 option(NANO_EDR_NO_THROWING_OS_HANDLE
        "Не собирать тесты бросающего конструктора OsHandle (с занятия 4.2)" OFF)
 
@@ -233,6 +231,39 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/examples/minimal_agent.cpp")
     target_link_libraries(minimal_agent PRIVATE os nano_edr_warnings)
     nano_edr_copy_runtime(minimal_agent)
 endif()
+
+# Упражнения — отдельные программы из tasks/<занятие>/exercise/. У каждой
+# своя цель, названная по имени файла, и собирается она только по запросу:
+#
+#     cmake --build --preset windows --target inheritance
+#
+# Цели заведены для всех занятий сразу, а не только для заданного номером:
+# упражнение не должно зависеть от того, переконфигурирован ли проект.
+#
+# В общую сборку они не входят, и -Werror к ним не применяется: упражнение
+# бывает написано так, чтобы компилятор предупредил, и под NANO_EDR_WERROR
+# это предупреждение остановило бы сборку агента. Стендам нужен ваш заголовок
+# из src/, поэтому src/ и комплект занятия есть на include-пути. С вашей
+# библиотекой упражнение не линкуется: незаконченный src/ не должен мешать
+# собрать программу, которой он не нужен.
+file(GLOB NANO_EDR_EXERCISES
+     "${CMAKE_CURRENT_SOURCE_DIR}/tasks/*/exercise/*.cpp")
+foreach(exercise IN LISTS NANO_EDR_EXERCISES)
+    get_filename_component(exercise_name "${exercise}" NAME_WE)
+    add_executable(${exercise_name} EXCLUDE_FROM_ALL "${exercise}")
+    target_include_directories(${exercise_name} PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/src")
+    if(NANO_EDR_KIT)
+        target_include_directories(${exercise_name} PRIVATE
+            "${CMAKE_CURRENT_SOURCE_DIR}/kit/include/${NANO_EDR_KIT}")
+    endif()
+    if(MSVC)
+        target_compile_options(${exercise_name} PRIVATE
+            /W4 /permissive- /utf-8 /w45038)
+    else()
+        target_compile_options(${exercise_name} PRIVATE -Wall -Wextra)
+    endif()
+endforeach()
 
 # ---------------------------------------------------------------------------
 # Выданные тесты

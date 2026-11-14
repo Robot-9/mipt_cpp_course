@@ -347,9 +347,6 @@ std::visit([](const auto& x) {
 template <typename... Ts>
 struct overload : Ts... { using Ts::operator()...; };
 
-template <typename... Ts>
-overload(Ts...) -> overload<Ts...>;  // deduction guide
-
 std::variant<int, double, std::string> v = std::string("hi");
 
 std::visit(overload{
@@ -359,7 +356,7 @@ std::visit(overload{
 }, v);
 ```
 
-Здесь `overload` наследуется от всех переданных лямбд (каждая — отдельный класс с одним `operator()`). Через `using Ts::operator()...` мы собираем все их `operator()` в один класс, и теперь `overload` сам имеет несколько перегрузок. `std::visit` выбирает нужную по типу активной альтернативы.
+Здесь `overload` наследуется от всех переданных лямбд (каждая — отдельный класс с одним `operator()`). Через `using Ts::operator()...` мы собираем все их `operator()` в один класс, и теперь `overload` сам имеет несколько перегрузок. `std::visit` выбирает нужную по типу активной альтернативы. Аргументы шаблона `overload{...}` выводит [CTAD](../glossary.md#ctad) с лекции 8: `overload` — [агрегат](../glossary.md#aggregate) (aggregate), и с C++20 вывод по его базам работает сам. В коде, написанном раньше, под шаблоном встретится ещё строка `overload(Ts...) -> overload<Ts...>;` — это [deduction guide](../glossary.md#deduction-guide) (необязательный подраздел лекции 8), который тогда был обязателен.
 
 Идиома встречается в production-коде на C++ повсеместно, и её стоит знать наизусть.
 
